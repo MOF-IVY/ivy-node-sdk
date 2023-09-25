@@ -10,26 +10,4 @@ const config = {
     instanceTraderRestApiAddress: 'http://localhost:3002/',
 };
 const sdk = new main_1.IvySDK(config);
-sdk
-    .newOperation({
-    exchangeMarket: 'bybit_linear',
-    operationType: 'long',
-    orderType: 'Market',
-    symbol: 'BTC/USDT',
-    leverage: 1,
-    leverageEntryPercent: 10,
-})
-    .then((result) => {
-    setTimeout(() => {
-        sdk.closeOperation({
-            exchangeMarket: 'bybit_linear',
-            operationType: 'long',
-            orderType: 'Market',
-            symbol: 'BTC/USDT',
-        });
-    }, 5000);
-})
-    .catch((e) => {
-    debugger;
-});
 //# sourceMappingURL=example.js.map
