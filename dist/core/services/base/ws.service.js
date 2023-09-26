@@ -5,7 +5,7 @@ const rxjs_1 = require("rxjs");
 const socket_io_client_1 = require("socket.io-client");
 class BaseWebsocketService {
     constructor(address) {
-        this.ready$ = new rxjs_1.Subject();
+        this.ready$ = new rxjs_1.BehaviorSubject(false);
         this.emissionsQueue = [];
         this.socket = (0, socket_io_client_1.io)(address);
         this.socket.on('welcome', () => {

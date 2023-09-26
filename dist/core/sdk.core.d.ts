@@ -28,7 +28,6 @@ export declare class IvySDK {
     private readonly pumpdump;
     private readonly loggingCenter;
     private readonly historyLoader;
-    private readonly ready$;
     constructor(opts?: ISDKConfigOpts);
     subscribeReady(): Observable<boolean>;
     clearLogs(keys: string[]): void;

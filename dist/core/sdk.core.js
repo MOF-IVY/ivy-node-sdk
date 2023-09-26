@@ -11,7 +11,6 @@ const rxjs_1 = require("rxjs");
 class IvySDK {
     constructor(opts) {
         var _a, _b, _c, _d, _e, _f, _g, _h;
-        this.ready$ = new rxjs_1.BehaviorSubject(false);
         this.apiKey = (_a = opts === null || opts === void 0 ? void 0 : opts.apiKey) !== null && _a !== void 0 ? _a : config_core_1.ENVConfig.scriptApiKey;
         this.instanceUid = (_b = opts === null || opts === void 0 ? void 0 : opts.instanceUid) !== null && _b !== void 0 ? _b : config_core_1.ENVConfig.scriptUid;
         this.gatewayWSApiAddress =
