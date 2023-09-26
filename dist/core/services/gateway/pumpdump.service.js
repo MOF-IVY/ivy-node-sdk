@@ -5,40 +5,40 @@ const rxjs_1 = require("rxjs");
 const ws_service_1 = require("../base/ws.service");
 class GatewayPumpDumpService extends ws_service_1.BaseWebsocketService {
     constructor(address) {
-        super([{ address, alias: 'pd' }]);
+        super(address);
         this.pumpStream$ = new rxjs_1.Subject();
         this.dumpStream$ = new rxjs_1.Subject();
     }
-    /**
-     * Always catch
-     */
     enablePumpStream(payload) {
-        this.subscribeEvent({
-            payload,
-            socketAlias: 'pd',
-            successEventName: 'pump-update',
-            eventName: 'subscribe-pump-stream',
-            successCallback: this.pumpStreamEventHandler.bind(this),
-            errorEventName: 'subscribe-pump-stream-error',
-            errorCallback: (data) => {
-                throw new Error(`Pump stream enable failed: ${(data === null || data === void 0 ? void 0 : data.error) || data}`);
-            },
+        return new Promise((resolve) => {
+            this.socket.on('pump-event', this.pumpStreamEventHandler.bind(this));
+            this.socket.once('subscribe-pump-stream-error', (error) => resolve(error));
+            this.socket.once('subscribe-pump-stream-success', () => resolve());
+            this.safeEmit('subscribe-pump-stream', payload);
         });
     }
-    /**
-     * Always catch
-     */
+    disablePumpStream(payload) {
+        return new Promise((resolve) => {
+            this.socket.off('pump-event', this.pumpStreamEventHandler.bind(this));
+            this.socket.once('unsubscribe-pump-stream-error', (error) => resolve(error));
+            this.socket.once('unsubscribe-pump-stream-success', () => resolve());
+            this.safeEmit('unsubscribe-pump-stream', payload);
+        });
+    }
     enableDumpStream(payload) {
-        this.subscribeEvent({
-            payload,
-            socketAlias: 'pd',
-            successEventName: 'dump-update',
-            eventName: 'subscribe-dump-stream',
-            successCallback: this.dumpStreamEventHandler.bind(this),
-            errorEventName: 'subscribe-dump-stream-error',
-            errorCallback: (data) => {
-                throw new Error(`Dump stream enable failed: ${(data === null || data === void 0 ? void 0 : data.error) || data}`);
-            },
+        return new Promise((resolve) => {
+            this.socket.on('dump-event', this.dumpStreamEventHandler.bind(this));
+            this.socket.once('subscribe-dump-stream-error', (error) => resolve(error));
+            this.socket.once('subscribe-dump-stream-success', () => resolve());
+            this.safeEmit('subscribe-dump-stream', payload);
+        });
+    }
+    disableDumpStream(payload) {
+        return new Promise((resolve) => {
+            this.socket.off('dump-event', this.dumpStreamEventHandler.bind(this));
+            this.socket.once('unsubscribe-dump-stream-error', (error) => resolve(error));
+            this.socket.once('unsubscribe-dump-stream-success', () => resolve());
+            this.safeEmit('unsubscribe-dump-stream', payload);
         });
     }
     subscribePumpStream() {

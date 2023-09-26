@@ -12,18 +12,19 @@ import { InstanceLoggingCenterService } from './services/instance/logging-center
 import { ITraderOpenOrderOpts } from '../models/trader/open-order-config.model';
 import { ITraderCloseOrderOpts } from '../models/trader/close-order-config.model';
 import { IHistoryLoadRequestOpts } from '../models/history-loader/history-load-request.model';
+import { BehaviorSubject, Observable, filter, map, zip } from 'rxjs';
 
 export interface ISDKConfigOpts {
   apiKey?: string;
   instanceUid?: string;
 
-  gatewayWSApiAddress?: string;
-  gatewayRESTApiAddress?: string;
+  gatewayWsApiAddress?: string;
+  gatewayRestApiAddress?: string;
 
-  instanceSSMWSApiAddress?: string;
+  instanceSSMWsApiAddress?: string;
   instanceTraderRestApiAddress?: string;
-  instanceLoggingCenterWSApiAddress?: string;
-  instanceHistoryLoaderWSApiAddress?: string;
+  instanceLoggingCenterWsApiAddress?: string;
+  instanceHistoryLoaderWsApiAddress?: string;
 }
 
 export class IvySDK {
@@ -42,36 +43,38 @@ export class IvySDK {
   private readonly loggingCenter: InstanceLoggingCenterService;
   private readonly historyLoader: InstanceHistoryLoaderService;
 
+  private readonly ready$ = new BehaviorSubject<boolean>(false);
+
   constructor(opts?: ISDKConfigOpts) {
     this.apiKey = opts?.apiKey ?? ENVConfig.scriptApiKey;
 
     this.instanceUid = opts?.instanceUid ?? ENVConfig.scriptUid;
 
     this.gatewayWSApiAddress =
-      opts?.gatewayWSApiAddress ?? 'ws://api.ivy.cryptobeam.net';
+      opts?.gatewayWsApiAddress ?? 'ws://api.ivy.cryptobeam.net';
 
     this.gatewayRESTApiAddress =
-      opts?.gatewayRESTApiAddress ?? 'https://api.ivy.cryptobeam.net/api/v1/';
+      opts?.gatewayRestApiAddress ?? 'https://api.ivy.cryptobeam.net/api/v1/';
 
     this.instanceSSMWSApiAddress =
-      opts?.instanceSSMWSApiAddress ?? 'http://ivy-ssm:3000/ssm';
+      opts?.instanceSSMWsApiAddress ?? 'http://ivy-ssm:3000/ssm';
 
     this.instanceTraderRestApiAddress =
       opts?.instanceTraderRestApiAddress ?? 'http://ivy-trader:3000';
 
     this.instanceLoggingCenterWSApiAddress =
-      opts?.instanceLoggingCenterWSApiAddress ??
+      opts?.instanceLoggingCenterWsApiAddress ??
       'ws://ivy-logging-center:3000/logging-center';
 
     this.instanceHistoryLoaderWSApiAddress =
-      opts?.instanceHistoryLoaderWSApiAddress ??
+      opts?.instanceHistoryLoaderWsApiAddress ??
       'ws://ivy-history-loader:3000/history-loader';
 
     this.ensureRequiredParametersOrThrow();
 
     this.SSM = new InstanceSSMService(this.instanceSSMWSApiAddress);
     this.pumpdump = new GatewayPumpDumpService(
-      `${this.gatewayWSApiAddress}/pumpdump-stream`,
+      `${this.gatewayWSApiAddress}/pumpdump`,
     );
     this.trader = new InstanceTraderService(
       this.instanceTraderRestApiAddress,
@@ -84,18 +87,18 @@ export class IvySDK {
     this.historyLoader = new InstanceHistoryLoaderService(
       this.instanceHistoryLoaderWSApiAddress,
     );
+  }
 
-    // TODO: delete
-    console.log({
-      apiKey: this.apiKey,
-      instanceUid: this.instanceUid,
-      gatewayWSApiAddress: this.gatewayWSApiAddress,
-      gatewayRESTApiAddress: this.gatewayRESTApiAddress,
-      instanceSSMWSApiAddress: this.instanceSSMWSApiAddress,
-      instanceTraderRestApiAddress: this.instanceTraderRestApiAddress,
-      instanceLoggingCenterWSApiAddress: this.instanceLoggingCenterWSApiAddress,
-      instanceHistoryLoaderWSApiAddress: this.instanceHistoryLoaderWSApiAddress,
-    });
+  subscribeReady(): Observable<boolean> {
+    return zip(
+      this.historyLoader.subscribeReady(),
+      this.loggingCenter.subscribeReady(),
+      this.pumpdump.subscribeReady(),
+      this.SSM.subscribeReady(),
+    ).pipe(
+      filter(([hl, lc, pd, ssm]) => !!hl && !!lc && !!pd && !!ssm),
+      map(() => true),
+    );
   }
 
   clearLogs(keys: string[]) {
@@ -103,7 +106,7 @@ export class IvySDK {
   }
 
   log(message: string | object, key: string, persist = false) {
-    this.loggingCenter.postLog(message, key, persist);
+    return this.loggingCenter.postLog(message, key, persist);
   }
 
   loadHistory(opts: IHistoryLoadRequestOpts) {
@@ -130,44 +133,48 @@ export class IvySDK {
     return this.trader.getClosedOperation(operationId);
   }
 
-  /**
-   * Always catch
-   */
   enableIKStream() {
-    this.SSM.enableIKStream();
+    return this.SSM.enableIKStream();
+  }
+
+  disableIKStream() {
+    return this.SSM.disableIKStream();
   }
 
   subscribeIKStream() {
     return this.SSM.subscribeIKStream();
   }
 
-  /**
-   * Always catch
-   */
   enableFKStream() {
-    this.SSM.enableFKStream();
+    return this.SSM.enableFKStream();
+  }
+
+  disableFKStream() {
+    return this.SSM.disableFKStream();
   }
 
   subscribeFKStream() {
     return this.SSM.subscribeFKStream();
   }
 
-  /**
-   * Always catch
-   */
   enablePumpStream(payload: { xm: ExchangesMarkets; tfs: string[] }) {
-    this.pumpdump.enablePumpStream(payload);
+    return this.pumpdump.enablePumpStream(payload);
+  }
+
+  disablePumpStream(payload: { xm: ExchangesMarkets }) {
+    return this.pumpdump.disablePumpStream(payload);
   }
 
   subscribePumpStream() {
     return this.pumpdump.subscribePumpStream();
   }
 
-  /**
-   * Always catch
-   */
   enableDumpStream(payload: { xm: ExchangesMarkets; tfs: string[] }) {
-    this.pumpdump.enableDumpStream(payload);
+    return this.pumpdump.enableDumpStream(payload);
+  }
+
+  disableDumpStream(payload: { xm: ExchangesMarkets }) {
+    return this.pumpdump.disableDumpStream(payload);
   }
 
   subscribeDumpStream() {

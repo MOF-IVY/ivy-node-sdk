@@ -5,32 +5,44 @@ const rxjs_1 = require("rxjs");
 const ws_service_1 = require("../base/ws.service");
 class InstanceSSMService extends ws_service_1.BaseWebsocketService {
     constructor(address) {
-        super([{ address, alias: 'ssm' }]);
+        super(address);
         this.IKStream$ = new rxjs_1.Subject();
         this.FKStream$ = new rxjs_1.Subject();
     }
     enableIKStream() {
-        this.subscribeEvent({
-            socketAlias: 'ssm',
-            successEventName: 'ik-event',
-            eventName: 'subscribe-ik-stream',
-            successCallback: this.IKStreamEventHandler.bind(this),
-            errorEventName: 'subscribe-ik-stream-error',
-            errorCallback: (data) => {
-                throw new Error(`IK stream enable failed: ${(data === null || data === void 0 ? void 0 : data.error) || data}`);
-            },
+        return new Promise((resolve) => {
+            this.socket.on('ik-event', this.IKStreamEventHandler.bind(this));
+            this.socket.once('subscribe-ik-stream-error', (error) => resolve(error));
+            this.socket.once('subscribe-ik-stream-success', () => resolve());
+            this.safeEmit('subscribe-ik-stream');
+        });
+    }
+    disableIKStream() {
+        return new Promise((resolve) => {
+            this.socket.off('ik-event', this.IKStreamEventHandler.bind(this));
+            this.socket.once('unsubscribe-ik-stream-error', (error) => resolve(error));
+            this.socket.once('unsubscribe-ik-stream-success', () => resolve());
+            this.safeEmit('unsubscribe-ik-stream');
+            this.IKStream$.complete();
+            this.IKStream$ = new rxjs_1.Subject();
         });
     }
     enableFKStream() {
-        this.subscribeEvent({
-            socketAlias: 'ssm',
-            successEventName: 'fk-event',
-            eventName: 'subscribe-fk-stream',
-            successCallback: this.FKStreamEventHandler.bind(this),
-            errorEventName: 'subscribe-fk-stream-error',
-            errorCallback: (data) => {
-                throw new Error(`IK stream enable failed: ${(data === null || data === void 0 ? void 0 : data.error) || data}`);
-            },
+        return new Promise((resolve) => {
+            this.socket.on('fk-event', this.FKStreamEventHandler.bind(this));
+            this.socket.once('subscribe-fk-stream-error', (error) => resolve(error));
+            this.socket.once('subscribe-fk-stream-success', () => resolve());
+            this.safeEmit('subscribe-fk-stream');
+        });
+    }
+    disableFKStream() {
+        return new Promise((resolve) => {
+            this.socket.off('fk-event', this.FKStreamEventHandler.bind(this));
+            this.socket.once('unsubscribe-fk-stream-error', (error) => resolve(error));
+            this.socket.once('unsubscribe-fk-stream-success', () => resolve());
+            this.safeEmit('unsubscribe-fk-stream');
+            this.FKStream$.complete();
+            this.FKStream$ = new rxjs_1.Subject();
         });
     }
     subscribeIKStream() {

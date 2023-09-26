@@ -1,12 +1,14 @@
 import { Observable } from 'rxjs';
-import { BaseWebsocketService } from '../base/ws.service';
+import { BaseWebsocketService, IStandardWsError } from '../base/ws.service';
 import { IFKEvent } from '../../../models/ssm/fk-event.model';
 export declare class InstanceSSMService extends BaseWebsocketService {
-    private readonly IKStream$;
-    private readonly FKStream$;
+    private IKStream$;
+    private FKStream$;
     constructor(address: string);
-    enableIKStream(): void;
-    enableFKStream(): void;
+    enableIKStream(): Promise<void | IStandardWsError>;
+    disableIKStream(): Promise<void | IStandardWsError>;
+    enableFKStream(): Promise<void | IStandardWsError>;
+    disableFKStream(): Promise<void | IStandardWsError>;
     subscribeIKStream(): Observable<IFKEvent>;
     subscribeFKStream(): Observable<IFKEvent>;
     private IKStreamEventHandler;

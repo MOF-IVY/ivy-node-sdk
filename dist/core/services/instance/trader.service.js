@@ -27,8 +27,8 @@ class InstanceTraderService {
     hasOperationOpen(xm, symbol, type) {
         return __awaiter(this, void 0, void 0, function* () {
             const resp = yield this.httpClient.get(`trader/operation/open/${xm}/${symbol}/${type}`);
-            if (resp.status <= 200 && resp.data.statusCode >= 300) {
-                return resp.data.data;
+            if (resp.status < 300 && resp.data.statusCode >= 300) {
+                throw new Error(`[${resp.data.statusCode}] ${resp.data.message}`);
             }
             if (resp.status >= 300) {
                 throw new Error(`[${InstanceTraderService.name}] http error while trying to get operation open: ${resp.statusText}`);
@@ -39,8 +39,8 @@ class InstanceTraderService {
     getClosedOperation(operationId) {
         return __awaiter(this, void 0, void 0, function* () {
             const resp = yield this.httpClient.get(`trader/operation/closed/${operationId}`);
-            if (resp.status <= 200 && resp.data.statusCode >= 300) {
-                return resp.data.data;
+            if (resp.status < 300 && resp.data.statusCode >= 300) {
+                throw new Error(`[${resp.data.statusCode}] ${resp.data.message}`);
             }
             if (resp.status >= 300) {
                 throw new Error(`[${InstanceTraderService.name}] http error while trying to get operation open: ${resp.statusText}`);
@@ -51,8 +51,8 @@ class InstanceTraderService {
     createNewOperation(opts) {
         return __awaiter(this, void 0, void 0, function* () {
             const resp = yield this.httpClient.post('trader/operation/new', opts);
-            if (resp.status <= 200 && resp.data.statusCode >= 300) {
-                return resp.data.data;
+            if (resp.status < 300 && resp.data.statusCode >= 300) {
+                throw new Error(`[${resp.data.statusCode}] ${resp.data.message}`);
             }
             if (resp.status >= 300) {
                 throw new Error(`[${InstanceTraderService.name}] http error while trying to create a new operation: ${resp.statusText}`);
@@ -63,8 +63,8 @@ class InstanceTraderService {
     closeOperation(opts) {
         return __awaiter(this, void 0, void 0, function* () {
             const resp = yield this.httpClient.post('trader/operation/close', opts);
-            if (resp.status <= 200 && resp.data.statusCode >= 300) {
-                return resp.data.data;
+            if (resp.status < 300 && resp.data.statusCode >= 300) {
+                throw new Error(`[${resp.data.statusCode}] ${resp.data.message}`);
             }
             if (resp.status >= 300) {
                 throw new Error(`[${InstanceTraderService.name}] http error while trying to close an operation: ${resp.statusText}`);
@@ -75,8 +75,8 @@ class InstanceTraderService {
     cancelOpenOrder(operationId) {
         return __awaiter(this, void 0, void 0, function* () {
             const resp = yield this.httpClient.delete(`trader/operation/open-order/${operationId}`);
-            if (resp.status <= 200 && resp.data.statusCode >= 300) {
-                return resp.data.data;
+            if (resp.status < 300 && resp.data.statusCode >= 300) {
+                throw new Error(`[${resp.data.statusCode}] ${resp.data.message}`);
             }
             if (resp.status >= 300) {
                 throw new Error(`[${InstanceTraderService.name}] http error while trying to cancel an operation open order: ${resp.statusText}`);
@@ -87,8 +87,8 @@ class InstanceTraderService {
     cancelCloseOrder(operationId) {
         return __awaiter(this, void 0, void 0, function* () {
             const resp = yield this.httpClient.delete(`trader/operation/close-order/${operationId}`);
-            if (resp.status <= 200 && resp.data.statusCode >= 300) {
-                return resp.data.data;
+            if (resp.status < 300 && resp.data.statusCode >= 300) {
+                throw new Error(`[${resp.data.statusCode}] ${resp.data.message}`);
             }
             if (resp.status >= 300) {
                 throw new Error(`[${InstanceTraderService.name}] http error while trying to cancel an operation close order: ${resp.statusText}`);

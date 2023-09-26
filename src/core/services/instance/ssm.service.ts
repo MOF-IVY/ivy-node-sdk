@@ -1,41 +1,65 @@
 import { Observable, Subject } from 'rxjs';
 
-import { BaseWebsocketService } from '../base/ws.service';
+import { BaseWebsocketService, IStandardWsError } from '../base/ws.service';
 
 import { IIKEvent } from '../../../models/ssm/ik-event.model';
 import { IFKEvent } from '../../../models/ssm/fk-event.model';
 
 export class InstanceSSMService extends BaseWebsocketService {
-  private readonly IKStream$ = new Subject<IIKEvent>();
-  private readonly FKStream$ = new Subject<IFKEvent>();
+  private IKStream$ = new Subject<IIKEvent>();
+  private FKStream$ = new Subject<IFKEvent>();
 
   constructor(address: string) {
-    super([{ address, alias: 'ssm' }]);
+    super(address);
   }
 
-  enableIKStream() {
-    this.subscribeEvent({
-      socketAlias: 'ssm',
-      successEventName: 'ik-event',
-      eventName: 'subscribe-ik-stream',
-      successCallback: this.IKStreamEventHandler.bind(this),
-      errorEventName: 'subscribe-ik-stream-error',
-      errorCallback: (data) => {
-        throw new Error(`IK stream enable failed: ${data?.error || data}`);
-      },
+  enableIKStream(): Promise<void | IStandardWsError> {
+    return new Promise((resolve) => {
+      this.socket.on('ik-event', this.IKStreamEventHandler.bind(this));
+      this.socket.once('subscribe-ik-stream-error', (error: IStandardWsError) =>
+        resolve(error),
+      );
+      this.socket.once('subscribe-ik-stream-success', () => resolve());
+      this.safeEmit('subscribe-ik-stream');
     });
   }
 
-  enableFKStream() {
-    this.subscribeEvent({
-      socketAlias: 'ssm',
-      successEventName: 'fk-event',
-      eventName: 'subscribe-fk-stream',
-      successCallback: this.FKStreamEventHandler.bind(this),
-      errorEventName: 'subscribe-fk-stream-error',
-      errorCallback: (data) => {
-        throw new Error(`IK stream enable failed: ${data?.error || data}`);
-      },
+  disableIKStream(): Promise<void | IStandardWsError> {
+    return new Promise((resolve) => {
+      this.socket.off('ik-event', this.IKStreamEventHandler.bind(this));
+      this.socket.once(
+        'unsubscribe-ik-stream-error',
+        (error: IStandardWsError) => resolve(error),
+      );
+      this.socket.once('unsubscribe-ik-stream-success', () => resolve());
+      this.safeEmit('unsubscribe-ik-stream');
+      this.IKStream$.complete();
+      this.IKStream$ = new Subject<IIKEvent>();
+    });
+  }
+
+  enableFKStream(): Promise<void | IStandardWsError> {
+    return new Promise((resolve) => {
+      this.socket.on('fk-event', this.FKStreamEventHandler.bind(this));
+      this.socket.once('subscribe-fk-stream-error', (error: IStandardWsError) =>
+        resolve(error),
+      );
+      this.socket.once('subscribe-fk-stream-success', () => resolve());
+      this.safeEmit('subscribe-fk-stream');
+    });
+  }
+
+  disableFKStream(): Promise<void | IStandardWsError> {
+    return new Promise((resolve) => {
+      this.socket.off('fk-event', this.FKStreamEventHandler.bind(this));
+      this.socket.once(
+        'unsubscribe-fk-stream-error',
+        (error: IStandardWsError) => resolve(error),
+      );
+      this.socket.once('unsubscribe-fk-stream-success', () => resolve());
+      this.safeEmit('unsubscribe-fk-stream');
+      this.FKStream$.complete();
+      this.FKStream$ = new Subject<IFKEvent>();
     });
   }
 

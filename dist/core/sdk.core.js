@@ -7,46 +7,40 @@ const trader_service_1 = require("./services/instance/trader.service");
 const pumpdump_service_1 = require("./services/gateway/pumpdump.service");
 const history_loader_service_1 = require("./services/instance/history-loader.service");
 const logging_center_service_1 = require("./services/instance/logging-center.service");
+const rxjs_1 = require("rxjs");
 class IvySDK {
     constructor(opts) {
         var _a, _b, _c, _d, _e, _f, _g, _h;
+        this.ready$ = new rxjs_1.BehaviorSubject(false);
         this.apiKey = (_a = opts === null || opts === void 0 ? void 0 : opts.apiKey) !== null && _a !== void 0 ? _a : config_core_1.ENVConfig.scriptApiKey;
         this.instanceUid = (_b = opts === null || opts === void 0 ? void 0 : opts.instanceUid) !== null && _b !== void 0 ? _b : config_core_1.ENVConfig.scriptUid;
         this.gatewayWSApiAddress =
-            (_c = opts === null || opts === void 0 ? void 0 : opts.gatewayWSApiAddress) !== null && _c !== void 0 ? _c : 'ws://api.ivy.cryptobeam.net';
+            (_c = opts === null || opts === void 0 ? void 0 : opts.gatewayWsApiAddress) !== null && _c !== void 0 ? _c : 'ws://api.ivy.cryptobeam.net';
         this.gatewayRESTApiAddress =
-            (_d = opts === null || opts === void 0 ? void 0 : opts.gatewayRESTApiAddress) !== null && _d !== void 0 ? _d : 'https://api.ivy.cryptobeam.net/api/v1/';
+            (_d = opts === null || opts === void 0 ? void 0 : opts.gatewayRestApiAddress) !== null && _d !== void 0 ? _d : 'https://api.ivy.cryptobeam.net/api/v1/';
         this.instanceSSMWSApiAddress =
-            (_e = opts === null || opts === void 0 ? void 0 : opts.instanceSSMWSApiAddress) !== null && _e !== void 0 ? _e : 'http://ivy-ssm:3000/ssm';
+            (_e = opts === null || opts === void 0 ? void 0 : opts.instanceSSMWsApiAddress) !== null && _e !== void 0 ? _e : 'http://ivy-ssm:3000/ssm';
         this.instanceTraderRestApiAddress =
             (_f = opts === null || opts === void 0 ? void 0 : opts.instanceTraderRestApiAddress) !== null && _f !== void 0 ? _f : 'http://ivy-trader:3000';
         this.instanceLoggingCenterWSApiAddress =
-            (_g = opts === null || opts === void 0 ? void 0 : opts.instanceLoggingCenterWSApiAddress) !== null && _g !== void 0 ? _g : 'ws://ivy-logging-center:3000/logging-center';
+            (_g = opts === null || opts === void 0 ? void 0 : opts.instanceLoggingCenterWsApiAddress) !== null && _g !== void 0 ? _g : 'ws://ivy-logging-center:3000/logging-center';
         this.instanceHistoryLoaderWSApiAddress =
-            (_h = opts === null || opts === void 0 ? void 0 : opts.instanceHistoryLoaderWSApiAddress) !== null && _h !== void 0 ? _h : 'ws://ivy-history-loader:3000/history-loader';
+            (_h = opts === null || opts === void 0 ? void 0 : opts.instanceHistoryLoaderWsApiAddress) !== null && _h !== void 0 ? _h : 'ws://ivy-history-loader:3000/history-loader';
         this.ensureRequiredParametersOrThrow();
         this.SSM = new ssm_service_1.InstanceSSMService(this.instanceSSMWSApiAddress);
-        this.pumpdump = new pumpdump_service_1.GatewayPumpDumpService(`${this.gatewayWSApiAddress}/pumpdump-stream`);
+        this.pumpdump = new pumpdump_service_1.GatewayPumpDumpService(`${this.gatewayWSApiAddress}/pumpdump`);
         this.trader = new trader_service_1.InstanceTraderService(this.instanceTraderRestApiAddress, this.apiKey);
         this.loggingCenter = new logging_center_service_1.InstanceLoggingCenterService(this.instanceLoggingCenterWSApiAddress, this.instanceUid);
         this.historyLoader = new history_loader_service_1.InstanceHistoryLoaderService(this.instanceHistoryLoaderWSApiAddress);
-        // TODO: delete
-        console.log({
-            apiKey: this.apiKey,
-            instanceUid: this.instanceUid,
-            gatewayWSApiAddress: this.gatewayWSApiAddress,
-            gatewayRESTApiAddress: this.gatewayRESTApiAddress,
-            instanceSSMWSApiAddress: this.instanceSSMWSApiAddress,
-            instanceTraderRestApiAddress: this.instanceTraderRestApiAddress,
-            instanceLoggingCenterWSApiAddress: this.instanceLoggingCenterWSApiAddress,
-            instanceHistoryLoaderWSApiAddress: this.instanceHistoryLoaderWSApiAddress,
-        });
+    }
+    subscribeReady() {
+        return (0, rxjs_1.zip)(this.historyLoader.subscribeReady(), this.loggingCenter.subscribeReady(), this.pumpdump.subscribeReady(), this.SSM.subscribeReady()).pipe((0, rxjs_1.filter)(([hl, lc, pd, ssm]) => !!hl && !!lc && !!pd && !!ssm), (0, rxjs_1.map)(() => true));
     }
     clearLogs(keys) {
         throw new Error('Not implemented');
     }
     log(message, key, persist = false) {
-        this.loggingCenter.postLog(message, key, persist);
+        return this.loggingCenter.postLog(message, key, persist);
     }
     loadHistory(opts) {
         return this.historyLoader.loadHistory(opts);
@@ -63,38 +57,38 @@ class IvySDK {
     getClosedOperation(operationId) {
         return this.trader.getClosedOperation(operationId);
     }
-    /**
-     * Always catch
-     */
     enableIKStream() {
-        this.SSM.enableIKStream();
+        return this.SSM.enableIKStream();
+    }
+    disableIKStream() {
+        return this.SSM.disableIKStream();
     }
     subscribeIKStream() {
         return this.SSM.subscribeIKStream();
     }
-    /**
-     * Always catch
-     */
     enableFKStream() {
-        this.SSM.enableFKStream();
+        return this.SSM.enableFKStream();
+    }
+    disableFKStream() {
+        return this.SSM.disableFKStream();
     }
     subscribeFKStream() {
         return this.SSM.subscribeFKStream();
     }
-    /**
-     * Always catch
-     */
     enablePumpStream(payload) {
-        this.pumpdump.enablePumpStream(payload);
+        return this.pumpdump.enablePumpStream(payload);
+    }
+    disablePumpStream(payload) {
+        return this.pumpdump.disablePumpStream(payload);
     }
     subscribePumpStream() {
         return this.pumpdump.subscribePumpStream();
     }
-    /**
-     * Always catch
-     */
     enableDumpStream(payload) {
-        this.pumpdump.enableDumpStream(payload);
+        return this.pumpdump.enableDumpStream(payload);
+    }
+    disableDumpStream(payload) {
+        return this.pumpdump.disableDumpStream(payload);
     }
     subscribeDumpStream() {
         return this.pumpdump.subscribeDumpStream();

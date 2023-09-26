@@ -29,8 +29,8 @@ export class InstanceTraderService {
     const resp = await this.httpClient.get<IBaseResponse<boolean>>(
       `trader/operation/open/${xm}/${symbol}/${type}`,
     );
-    if (resp.status <= 200 && resp.data.statusCode >= 300) {
-      return resp.data.data!;
+    if (resp.status < 300 && resp.data.statusCode >= 300) {
+      throw new Error(`[${resp.data.statusCode}] ${resp.data.message}`);
     }
     if (resp.status >= 300) {
       throw new Error(
@@ -44,8 +44,8 @@ export class InstanceTraderService {
     const resp = await this.httpClient.get<IBaseResponse<ITraderOperation>>(
       `trader/operation/closed/${operationId}`,
     );
-    if (resp.status <= 200 && resp.data.statusCode >= 300) {
-      return resp.data.data!;
+    if (resp.status < 300 && resp.data.statusCode >= 300) {
+      throw new Error(`[${resp.data.statusCode}] ${resp.data.message}`);
     }
     if (resp.status >= 300) {
       throw new Error(
@@ -62,8 +62,8 @@ export class InstanceTraderService {
       'trader/operation/new',
       opts,
     );
-    if (resp.status <= 200 && resp.data.statusCode >= 300) {
-      return resp.data.data!;
+    if (resp.status < 300 && resp.data.statusCode >= 300) {
+      throw new Error(`[${resp.data.statusCode}] ${resp.data.message}`);
     }
     if (resp.status >= 300) {
       throw new Error(
@@ -78,8 +78,8 @@ export class InstanceTraderService {
       'trader/operation/close',
       opts,
     );
-    if (resp.status <= 200 && resp.data.statusCode >= 300) {
-      return resp.data.data!;
+    if (resp.status < 300 && resp.data.statusCode >= 300) {
+      throw new Error(`[${resp.data.statusCode}] ${resp.data.message}`);
     }
     if (resp.status >= 300) {
       throw new Error(
@@ -93,8 +93,8 @@ export class InstanceTraderService {
     const resp = await this.httpClient.delete<IBaseResponse<boolean>>(
       `trader/operation/open-order/${operationId}`,
     );
-    if (resp.status <= 200 && resp.data.statusCode >= 300) {
-      return resp.data.data!;
+    if (resp.status < 300 && resp.data.statusCode >= 300) {
+      throw new Error(`[${resp.data.statusCode}] ${resp.data.message}`);
     }
     if (resp.status >= 300) {
       throw new Error(
@@ -108,8 +108,8 @@ export class InstanceTraderService {
     const resp = await this.httpClient.delete<IBaseResponse<boolean>>(
       `trader/operation/close-order/${operationId}`,
     );
-    if (resp.status <= 200 && resp.data.statusCode >= 300) {
-      return resp.data.data!;
+    if (resp.status < 300 && resp.data.statusCode >= 300) {
+      throw new Error(`[${resp.data.statusCode}] ${resp.data.message}`);
     }
     if (resp.status >= 300) {
       throw new Error(

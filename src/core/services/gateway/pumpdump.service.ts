@@ -1,48 +1,76 @@
 import { Observable, Subject } from 'rxjs';
 
-import { BaseWebsocketService } from '../base/ws.service';
+import { BaseWebsocketService, IStandardWsError } from '../base/ws.service';
 import { IPumpDumpEvent } from '../../../models/pumpdump/pumpdump-event.model';
 import { ExchangesMarkets } from '../../../main';
 
 export class GatewayPumpDumpService extends BaseWebsocketService {
-  private readonly pumpStream$ = new Subject<IPumpDumpEvent>();
-  private readonly dumpStream$ = new Subject<IPumpDumpEvent>();
+  private pumpStream$ = new Subject<IPumpDumpEvent>();
+  private dumpStream$ = new Subject<IPumpDumpEvent>();
 
   constructor(address: string) {
-    super([{ address, alias: 'pd' }]);
+    super(address);
   }
 
-  /**
-   * Always catch
-   */
-  enablePumpStream(payload: { xm: ExchangesMarkets; tfs: string[] }) {
-    this.subscribeEvent({
-      payload,
-      socketAlias: 'pd',
-      successEventName: 'pump-update',
-      eventName: 'subscribe-pump-stream',
-      successCallback: this.pumpStreamEventHandler.bind(this),
-      errorEventName: 'subscribe-pump-stream-error',
-      errorCallback: (data) => {
-        throw new Error(`Pump stream enable failed: ${data?.error || data}`);
-      },
+  enablePumpStream(payload: {
+    xm: ExchangesMarkets;
+    tfs: string[];
+  }): Promise<void | IStandardWsError> {
+    return new Promise((resolve) => {
+      this.socket.on('pump-event', this.pumpStreamEventHandler.bind(this));
+      this.socket.once(
+        'subscribe-pump-stream-error',
+        (error: IStandardWsError) => resolve(error),
+      );
+      this.socket.once('subscribe-pump-stream-success', () => resolve());
+      this.safeEmit('subscribe-pump-stream', payload);
     });
   }
 
-  /**
-   * Always catch
-   */
-  enableDumpStream(payload: { xm: ExchangesMarkets; tfs: string[] }) {
-    this.subscribeEvent({
-      payload,
-      socketAlias: 'pd',
-      successEventName: 'dump-update',
-      eventName: 'subscribe-dump-stream',
-      successCallback: this.dumpStreamEventHandler.bind(this),
-      errorEventName: 'subscribe-dump-stream-error',
-      errorCallback: (data) => {
-        throw new Error(`Dump stream enable failed: ${data?.error || data}`);
-      },
+  disablePumpStream(payload: {
+    xm: ExchangesMarkets;
+  }): Promise<void | IStandardWsError> {
+    return new Promise((resolve) => {
+      this.socket.off('pump-event', this.pumpStreamEventHandler.bind(this));
+      this.socket.once(
+        'unsubscribe-pump-stream-error',
+        (error: IStandardWsError) => resolve(error),
+      );
+      this.socket.once('unsubscribe-pump-stream-success', () => resolve());
+      this.safeEmit('unsubscribe-pump-stream', payload);
+      this.pumpStream$.complete();
+      this.pumpStream$ = new Subject<IPumpDumpEvent>();
+    });
+  }
+
+  enableDumpStream(payload: {
+    xm: ExchangesMarkets;
+    tfs: string[];
+  }): Promise<void | IStandardWsError> {
+    return new Promise((resolve) => {
+      this.socket.on('dump-event', this.dumpStreamEventHandler.bind(this));
+      this.socket.once(
+        'subscribe-dump-stream-error',
+        (error: IStandardWsError) => resolve(error),
+      );
+      this.socket.once('subscribe-dump-stream-success', () => resolve());
+      this.safeEmit('subscribe-dump-stream', payload);
+    });
+  }
+
+  disableDumpStream(payload: {
+    xm: ExchangesMarkets;
+  }): Promise<void | IStandardWsError> {
+    return new Promise((resolve) => {
+      this.socket.off('dump-event', this.dumpStreamEventHandler.bind(this));
+      this.socket.once(
+        'unsubscribe-dump-stream-error',
+        (error: IStandardWsError) => resolve(error),
+      );
+      this.socket.once('unsubscribe-dump-stream-success', () => resolve());
+      this.safeEmit('unsubscribe-dump-stream', payload);
+      this.dumpStream$.complete();
+      this.dumpStream$ = new Subject<IPumpDumpEvent>();
     });
   }
 
