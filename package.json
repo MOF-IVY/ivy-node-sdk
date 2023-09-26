@@ -1,5 +1,5 @@
 {
-  "name": "ivy-node-sdk",
+  "name": "@mof-ivy/ivy-node-sdk",
   "version": "1.0.0",
   "description": "Official IVY node sdk",
   "main": "dist/main.js",
