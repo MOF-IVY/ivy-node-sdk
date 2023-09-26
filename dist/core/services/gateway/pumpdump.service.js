@@ -23,6 +23,8 @@ class GatewayPumpDumpService extends ws_service_1.BaseWebsocketService {
             this.socket.once('unsubscribe-pump-stream-error', (error) => resolve(error));
             this.socket.once('unsubscribe-pump-stream-success', () => resolve());
             this.safeEmit('unsubscribe-pump-stream', payload);
+            this.pumpStream$.complete();
+            this.pumpStream$ = new rxjs_1.Subject();
         });
     }
     enableDumpStream(payload) {
@@ -39,6 +41,8 @@ class GatewayPumpDumpService extends ws_service_1.BaseWebsocketService {
             this.socket.once('unsubscribe-dump-stream-error', (error) => resolve(error));
             this.socket.once('unsubscribe-dump-stream-success', () => resolve());
             this.safeEmit('unsubscribe-dump-stream', payload);
+            this.dumpStream$.complete();
+            this.dumpStream$ = new rxjs_1.Subject();
         });
     }
     subscribePumpStream() {

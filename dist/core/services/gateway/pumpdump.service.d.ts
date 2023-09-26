@@ -3,8 +3,8 @@ import { BaseWebsocketService, IStandardWsError } from '../base/ws.service';
 import { IPumpDumpEvent } from '../../../models/pumpdump/pumpdump-event.model';
 import { ExchangesMarkets } from '../../../main';
 export declare class GatewayPumpDumpService extends BaseWebsocketService {
-    private readonly pumpStream$;
-    private readonly dumpStream$;
+    private pumpStream$;
+    private dumpStream$;
     constructor(address: string);
     enablePumpStream(payload: {
         xm: ExchangesMarkets;
