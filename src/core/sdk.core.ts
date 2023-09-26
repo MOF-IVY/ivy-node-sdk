@@ -43,8 +43,6 @@ export class IvySDK {
   private readonly loggingCenter: InstanceLoggingCenterService;
   private readonly historyLoader: InstanceHistoryLoaderService;
 
-  private readonly ready$ = new BehaviorSubject<boolean>(false);
-
   constructor(opts?: ISDKConfigOpts) {
     this.apiKey = opts?.apiKey ?? ENVConfig.scriptApiKey;
 

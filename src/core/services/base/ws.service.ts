@@ -1,4 +1,4 @@
-import { Observable, Subject } from 'rxjs';
+import { BehaviorSubject, Observable, Subject } from 'rxjs';
 import { Socket, io } from 'socket.io-client';
 
 export interface IStandardWsError {
@@ -7,7 +7,7 @@ export interface IStandardWsError {
 
 export abstract class BaseWebsocketService {
   protected readonly socket: Socket;
-  private readonly ready$ = new Subject<boolean>();
+  private readonly ready$ = new BehaviorSubject<boolean>(false);
 
   private emissionsQueue: [string, object | number | string | undefined][] = [];
 
