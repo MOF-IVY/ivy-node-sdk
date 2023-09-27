@@ -1,5 +1,6 @@
 import { BehaviorSubject, Observable, Subject } from 'rxjs';
 import { Socket, io } from 'socket.io-client';
+import { ENVConfig } from '../../config/config/config.core';
 
 export interface IStandardWsError {
   error: string;
@@ -14,6 +15,7 @@ export abstract class BaseWebsocketService {
   constructor(address: string) {
     this.socket = io(address);
     this.socket.on('welcome', () => {
+      if (ENVConfig.verboseMode) console.log(`[${address}] welcome received`);
       this.ready$.next(true);
       this.emissionsQueue.forEach(([event, payload], idx) => {
         this.socket.emit(event, payload);
@@ -22,8 +24,14 @@ export abstract class BaseWebsocketService {
         );
       });
     });
-    this.socket.on('connect', () => this.ready$.next(false));
-    this.socket.on('disconnect', () => this.ready$.next(false));
+    this.socket.on('connect', () => {
+      this.ready$.next(false);
+      if (ENVConfig.verboseMode) console.log(`[${address}] connected`);
+    });
+    this.socket.on('disconnect', () => {
+      this.ready$.next(false);
+      if (ENVConfig.verboseMode) console.log(`[${address}] disconnected`);
+    });
   }
 
   subscribeReady(): Observable<boolean> {

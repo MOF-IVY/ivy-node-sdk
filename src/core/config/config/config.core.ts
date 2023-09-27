@@ -2,6 +2,10 @@ import * as process from 'process';
 import { ENVConfigs } from './config.enum';
 
 export class ENVConfig {
+  static get verboseMode(): boolean {
+    return this.getConfig(ENVConfigs.verbose) === 'true';
+  }
+
   static get scriptUid(): string {
     this.ensureConfigExistenceOrThrow(ENVConfigs.scriptUid);
     return this.getConfig(ENVConfigs.scriptUid);
