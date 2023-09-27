@@ -68,6 +68,16 @@ export class IvySDK {
       opts?.instanceHistoryLoaderWsApiAddress ??
       'ws://ivy-history-loader:3000/history-loader';
 
+    console.log({
+      instanceUid: this.instanceUid,
+      gatewayWSApiAddress: this.gatewayWSApiAddress,
+      gatewayRESTApiAddress: this.gatewayRESTApiAddress,
+      instanceSSMWSApiAddress: this.instanceSSMWSApiAddress,
+      instanceTraderRestApiAddress: this.instanceTraderRestApiAddress,
+      instanceLoggingCenterWSApiAddress: this.instanceLoggingCenterWSApiAddress,
+      instanceHistoryLoaderWSApiAddress: this.instanceHistoryLoaderWSApiAddress,
+    });
+
     this.ensureRequiredParametersOrThrow();
 
     this.SSM = new InstanceSSMService(this.instanceSSMWSApiAddress);

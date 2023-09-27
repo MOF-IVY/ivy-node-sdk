@@ -25,6 +25,15 @@ class IvySDK {
             (_g = opts === null || opts === void 0 ? void 0 : opts.instanceLoggingCenterWsApiAddress) !== null && _g !== void 0 ? _g : 'ws://ivy-logging-center:3000/logging-center';
         this.instanceHistoryLoaderWSApiAddress =
             (_h = opts === null || opts === void 0 ? void 0 : opts.instanceHistoryLoaderWsApiAddress) !== null && _h !== void 0 ? _h : 'ws://ivy-history-loader:3000/history-loader';
+        console.log({
+            instanceUid: this.instanceUid,
+            gatewayWSApiAddress: this.gatewayWSApiAddress,
+            gatewayRESTApiAddress: this.gatewayRESTApiAddress,
+            instanceSSMWSApiAddress: this.instanceSSMWSApiAddress,
+            instanceTraderRestApiAddress: this.instanceTraderRestApiAddress,
+            instanceLoggingCenterWSApiAddress: this.instanceLoggingCenterWSApiAddress,
+            instanceHistoryLoaderWSApiAddress: this.instanceHistoryLoaderWSApiAddress,
+        });
         this.ensureRequiredParametersOrThrow();
         this.SSM = new ssm_service_1.InstanceSSMService(this.instanceSSMWSApiAddress);
         this.pumpdump = new pumpdump_service_1.GatewayPumpDumpService(`${this.gatewayWSApiAddress}/pumpdump`);
