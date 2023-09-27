@@ -3,6 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.ENVConfigs = void 0;
 var ENVConfigs;
 (function (ENVConfigs) {
+    ENVConfigs["verbose"] = "IVY_SDK_VERBOSE";
     ENVConfigs["scriptUid"] = "IVY_SCRIPT_UID";
     ENVConfigs["scriptApiKey"] = "IVY_SCRIPT_API_KEY";
     ENVConfigs["scriptPersistancePath"] = "IVY_SCRIPT_PERSISTANCE_PATH";
