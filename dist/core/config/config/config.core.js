@@ -28,7 +28,7 @@ const process = __importStar(require("process"));
 const config_enum_1 = require("./config.enum");
 class ENVConfig {
     static get verboseMode() {
-        return this.getConfig(config_enum_1.ENVConfigs.verbose) === 'true';
+        return true || this.getConfig(config_enum_1.ENVConfigs.verbose) === 'true';
     }
     static get scriptUid() {
         this.ensureConfigExistenceOrThrow(config_enum_1.ENVConfigs.scriptUid);
