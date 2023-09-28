@@ -16,7 +16,7 @@ export class InstanceLoggingCenterService extends BaseWebsocketService {
 
     this.logsQueue$
       .pipe(
-        delay(1000),
+        delay(5000),
         tap(({ message }) => console.log(message)),
         tap(({ persist, message, key }) => {
           const logObject = persist
