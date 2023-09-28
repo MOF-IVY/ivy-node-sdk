@@ -42,7 +42,7 @@ class IvySDK {
         this.historyLoader = new history_loader_service_1.InstanceHistoryLoaderService(this.instanceHistoryLoaderWSApiAddress);
     }
     subscribeReady() {
-        return (0, rxjs_1.zip)(this.historyLoader.subscribeReady(), this.loggingCenter.subscribeReady(), this.pumpdump.subscribeReady(), this.SSM.subscribeReady()).pipe((0, rxjs_1.filter)(([hl, lc, pd, ssm]) => !!hl && !!lc && !!pd && !!ssm), (0, rxjs_1.map)(() => true));
+        return (0, rxjs_1.zip)(this.SSM.subscribeReady(), this.pumpdump.subscribeReady(), this.historyLoader.subscribeReady(), this.loggingCenter.subscribeReady()).pipe((0, rxjs_1.filter)(([ssm, pd, hl, lc]) => !!hl && !!lc && !!pd && !!ssm), (0, rxjs_1.map)(() => true));
     }
     clearLogs(keys) {
         throw new Error('Not implemented');

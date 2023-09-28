@@ -31,7 +31,7 @@ export declare class IvySDK {
     constructor(opts?: ISDKConfigOpts);
     subscribeReady(): Observable<boolean>;
     clearLogs(keys: string[]): void;
-    log(message: string | object, key: string, persist?: boolean): Promise<boolean | import("./services/base/ws.service").IStandardWsError>;
+    log(message: string | object, key: string, persist?: boolean): void;
     loadHistory(opts: IHistoryLoadRequestOpts): Promise<import("../main").IHistoryLoaded>;
     newOperation(opts: ITraderOpenOrderOpts): Promise<import("../main").ITraderOperation<unknown>>;
     closeOperation(opts: ITraderCloseOrderOpts): Promise<import("../main").ITraderOperation<unknown>>;

@@ -99,12 +99,12 @@ export class IvySDK {
 
   subscribeReady(): Observable<boolean> {
     return zip(
+      this.SSM.subscribeReady(),
+      this.pumpdump.subscribeReady(),
       this.historyLoader.subscribeReady(),
       this.loggingCenter.subscribeReady(),
-      this.pumpdump.subscribeReady(),
-      this.SSM.subscribeReady(),
     ).pipe(
-      filter(([hl, lc, pd, ssm]) => !!hl && !!lc && !!pd && !!ssm),
+      filter(([ssm, pd, hl, lc]) => !!hl && !!lc && !!pd && !!ssm),
       map(() => true),
     );
   }
