@@ -14,7 +14,7 @@ export class InstanceLoggingCenterService extends BaseWebsocketService {
   constructor(address: string, private readonly instanceUid: string) {
     super(address);
 
-    interval(500)
+    interval(100)
       .pipe(
         filter(() => !!this.logsQueue.length),
         map(() => this.logsQueue.shift()!),
