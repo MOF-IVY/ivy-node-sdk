@@ -13,7 +13,7 @@ export abstract class BaseWebsocketService {
   private emissionsQueue: [string, object | number | string | undefined][] = [];
 
   constructor(address: string) {
-    this.socket = io(address);
+    this.socket = io(address, { auth: { apiKey: ENVConfig.scriptApiKey } });
     this.socket.on('welcome', () => {
       if (ENVConfig.verboseMode) console.log(`[${address}] welcome received`);
       this.ready$.next(true);
