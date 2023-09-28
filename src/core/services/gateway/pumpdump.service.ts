@@ -23,7 +23,7 @@ export class GatewayPumpDumpService extends BaseWebsocketService {
         (error: IStandardWsError) => resolve(error),
       );
       this.socket.once('subscribe-pump-stream-success', () => resolve());
-      this.safeEmit('subscribe-pump-stream', payload);
+      this.safeEmitWithReconnect('subscribe-pump-stream', payload);
     });
   }
 
@@ -54,7 +54,7 @@ export class GatewayPumpDumpService extends BaseWebsocketService {
         (error: IStandardWsError) => resolve(error),
       );
       this.socket.once('subscribe-dump-stream-success', () => resolve());
-      this.safeEmit('subscribe-dump-stream', payload);
+      this.safeEmitWithReconnect('subscribe-dump-stream', payload);
     });
   }
 

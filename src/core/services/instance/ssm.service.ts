@@ -20,7 +20,7 @@ export class InstanceSSMService extends BaseWebsocketService {
         resolve(error),
       );
       this.socket.once('subscribe-ik-stream-success', () => resolve());
-      this.safeEmit('subscribe-ik-stream');
+      this.safeEmitWithReconnect('subscribe-ik-stream');
     });
   }
 
@@ -45,7 +45,7 @@ export class InstanceSSMService extends BaseWebsocketService {
         resolve(error),
       );
       this.socket.once('subscribe-fk-stream-success', () => resolve());
-      this.safeEmit('subscribe-fk-stream');
+      this.safeEmitWithReconnect('subscribe-fk-stream');
     });
   }
 

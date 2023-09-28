@@ -14,7 +14,7 @@ class InstanceSSMService extends ws_service_1.BaseWebsocketService {
             this.socket.on('ik-event', this.IKStreamEventHandler.bind(this));
             this.socket.once('subscribe-ik-stream-error', (error) => resolve(error));
             this.socket.once('subscribe-ik-stream-success', () => resolve());
-            this.safeEmit('subscribe-ik-stream');
+            this.safeEmitWithReconnect('subscribe-ik-stream');
         });
     }
     disableIKStream() {
@@ -32,7 +32,7 @@ class InstanceSSMService extends ws_service_1.BaseWebsocketService {
             this.socket.on('fk-event', this.FKStreamEventHandler.bind(this));
             this.socket.once('subscribe-fk-stream-error', (error) => resolve(error));
             this.socket.once('subscribe-fk-stream-success', () => resolve());
-            this.safeEmit('subscribe-fk-stream');
+            this.safeEmitWithReconnect('subscribe-fk-stream');
         });
     }
     disableFKStream() {

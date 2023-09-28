@@ -14,7 +14,7 @@ class GatewayPumpDumpService extends ws_service_1.BaseWebsocketService {
             this.socket.on('pump-event', this.pumpStreamEventHandler.bind(this));
             this.socket.once('subscribe-pump-stream-error', (error) => resolve(error));
             this.socket.once('subscribe-pump-stream-success', () => resolve());
-            this.safeEmit('subscribe-pump-stream', payload);
+            this.safeEmitWithReconnect('subscribe-pump-stream', payload);
         });
     }
     disablePumpStream(payload) {
@@ -32,7 +32,7 @@ class GatewayPumpDumpService extends ws_service_1.BaseWebsocketService {
             this.socket.on('dump-event', this.dumpStreamEventHandler.bind(this));
             this.socket.once('subscribe-dump-stream-error', (error) => resolve(error));
             this.socket.once('subscribe-dump-stream-success', () => resolve());
-            this.safeEmit('subscribe-dump-stream', payload);
+            this.safeEmitWithReconnect('subscribe-dump-stream', payload);
         });
     }
     disableDumpStream(payload) {

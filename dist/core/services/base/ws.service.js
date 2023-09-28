@@ -7,12 +7,14 @@ const config_core_1 = require("../../config/config/config.core");
 class BaseWebsocketService {
     constructor(address) {
         this.ready$ = new rxjs_1.BehaviorSubject(false);
+        this.eventsToEmitOnReconnect = [];
         this.emissionsQueue = [];
         this.socket = (0, socket_io_client_1.io)(address, { auth: { apiKey: config_core_1.ENVConfig.scriptApiKey } });
         this.socket.on('welcome', () => {
             if (config_core_1.ENVConfig.verboseMode)
                 console.log(`[${address}] welcome received`);
             this.ready$.next(true);
+            this.eventsToEmitOnReconnect.forEach((s) => this.socket.emit(s.event, s.payload ? s.payload : undefined));
             this.emissionsQueue.forEach(([event, payload], idx) => {
                 this.socket.emit(event, payload);
                 this.emissionsQueue = this.emissionsQueue.filter(([, _idx]) => idx !== idx);
@@ -39,6 +41,15 @@ class BaseWebsocketService {
         else {
             this.emissionsQueue.push([eventName, payload]);
         }
+    }
+    safeEmitWithReconnect(eventName, payload) {
+        this.addToAutoReconnectionEvents(eventName, payload);
+        this.safeEmit(eventName, payload);
+    }
+    addToAutoReconnectionEvents(event, payload) {
+        if (this.eventsToEmitOnReconnect.find((s) => s.event === event))
+            return;
+        this.eventsToEmitOnReconnect.push({ event, payload });
     }
 }
 exports.BaseWebsocketService = BaseWebsocketService;
