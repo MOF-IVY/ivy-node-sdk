@@ -8,7 +8,7 @@ class BaseWebsocketService {
     constructor(address) {
         this.ready$ = new rxjs_1.BehaviorSubject(false);
         this.emissionsQueue = [];
-        this.socket = (0, socket_io_client_1.io)(address);
+        this.socket = (0, socket_io_client_1.io)(address, { auth: { apiKey: config_core_1.ENVConfig.scriptApiKey } });
         this.socket.on('welcome', () => {
             if (config_core_1.ENVConfig.verboseMode)
                 console.log(`[${address}] welcome received`);
