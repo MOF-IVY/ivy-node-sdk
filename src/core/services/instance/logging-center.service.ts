@@ -16,7 +16,7 @@ export class InstanceLoggingCenterService extends BaseWebsocketService {
 
     this.logsQueue$
       .pipe(
-        delay(50),
+        delay(100),
         tap(({ persist, message, key }) => {
           const logObject = persist
             ? new IvyStoredLog(message, key, this.instanceUid)
