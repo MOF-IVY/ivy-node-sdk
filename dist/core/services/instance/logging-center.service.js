@@ -9,9 +9,9 @@ class InstanceLoggingCenterService extends ws_service_1.BaseWebsocketService {
     constructor(address, instanceUid) {
         super(address);
         this.instanceUid = instanceUid;
-        this.logsQueue$ = new rxjs_1.Subject();
-        this.logsQueue$
-            .pipe((0, rxjs_1.delay)(5000), (0, rxjs_1.tap)(({ message }) => console.log(message)), (0, rxjs_1.tap)(({ persist, message, key }) => {
+        this.logsQueue = [];
+        (0, rxjs_1.interval)(500)
+            .pipe((0, rxjs_1.filter)(() => !!this.logsQueue.length), (0, rxjs_1.map)(() => this.logsQueue.shift()), (0, rxjs_1.tap)(({ persist, message, key }) => {
             const logObject = persist
                 ? new stored_log_model_1.IvyStoredLog(message, key, this.instanceUid)
                 : new log_model_1.IvyLog(message, key, this.instanceUid);
@@ -21,7 +21,7 @@ class InstanceLoggingCenterService extends ws_service_1.BaseWebsocketService {
             .subscribe();
     }
     postLog(message, key, persist) {
-        this.logsQueue$.next({ message, key, persist });
+        this.logsQueue.push({ message, key, persist });
     }
 }
 exports.InstanceLoggingCenterService = InstanceLoggingCenterService;
