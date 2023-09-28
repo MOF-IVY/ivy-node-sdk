@@ -14,10 +14,11 @@ export class InstanceLoggingCenterService extends BaseWebsocketService {
   constructor(address: string, private readonly instanceUid: string) {
     super(address);
 
-    interval(100)
+    interval(500)
       .pipe(
         filter(() => !!this.logsQueue.length),
         map(() => this.logsQueue.shift()!),
+        tap(({ message }) => console.log(message)),
         tap(({ persist, message, key }) => {
           const logObject = persist
             ? new IvyStoredLog(message, key, this.instanceUid)

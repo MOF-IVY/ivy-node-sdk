@@ -10,8 +10,8 @@ class InstanceLoggingCenterService extends ws_service_1.BaseWebsocketService {
         super(address);
         this.instanceUid = instanceUid;
         this.logsQueue = [];
-        (0, rxjs_1.interval)(100)
-            .pipe((0, rxjs_1.filter)(() => !!this.logsQueue.length), (0, rxjs_1.map)(() => this.logsQueue.shift()), (0, rxjs_1.tap)(({ persist, message, key }) => {
+        (0, rxjs_1.interval)(500)
+            .pipe((0, rxjs_1.filter)(() => !!this.logsQueue.length), (0, rxjs_1.map)(() => this.logsQueue.shift()), (0, rxjs_1.tap)(({ message }) => console.log(message)), (0, rxjs_1.tap)(({ persist, message, key }) => {
             const logObject = persist
                 ? new stored_log_model_1.IvyStoredLog(message, key, this.instanceUid)
                 : new log_model_1.IvyLog(message, key, this.instanceUid);
