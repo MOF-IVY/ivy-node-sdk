@@ -18,6 +18,7 @@ class IvyLog {
             log: this.log,
             time: this.time,
             persist: this.persist,
+            instanceUid: this.instanceUid,
             jsonParsable: this.jsonParsable,
         };
     }

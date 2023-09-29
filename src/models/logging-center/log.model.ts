@@ -25,6 +25,7 @@ export class IvyLog implements IPostLogConfig {
       log: this.log,
       time: this.time,
       persist: this.persist,
+      instanceUid: this.instanceUid,
       jsonParsable: this.jsonParsable,
     };
   }
