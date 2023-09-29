@@ -6,15 +6,14 @@ const log_model_1 = require("../../../models/logging-center/log.model");
 const stored_log_model_1 = require("../../../models/logging-center/stored-log.model");
 const rxjs_1 = require("rxjs");
 class InstanceLoggingCenterService extends ws_service_1.BaseWebsocketService {
-    constructor(address, instanceUid) {
+    constructor(address) {
         super(address);
-        this.instanceUid = instanceUid;
         this.logsQueue = [];
         (0, rxjs_1.interval)(100)
             .pipe((0, rxjs_1.filter)(() => !!this.logsQueue.length), (0, rxjs_1.map)(() => this.logsQueue.shift()), (0, rxjs_1.tap)(({ message }) => console.log(message)), (0, rxjs_1.tap)(({ persist, message, key }) => {
             const logObject = persist
-                ? new stored_log_model_1.IvyStoredLog(message, key, this.instanceUid)
-                : new log_model_1.IvyLog(message, key, this.instanceUid);
+                ? new stored_log_model_1.IvyStoredLog(message, key)
+                : new log_model_1.IvyLog(message, key);
             this.socket.once('post-log-error', (error) => console.error(`Error posting log: ${error.error}`));
             this.socket.emit('post-log', logObject.toJSON());
         }))

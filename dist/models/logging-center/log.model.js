@@ -2,13 +2,12 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.IvyLog = void 0;
 class IvyLog {
-    constructor(log, key, instanceUid) {
+    constructor(log, key) {
         if (typeof log === 'function')
             throw new Error('IvyLog does not support functions as log items');
         this.key = key;
         this.persist = false;
         this.time = Date.now();
-        this.instanceUid = instanceUid;
         this.jsonParsable = typeof log === 'object';
         this.log = this.jsonParsable ? JSON.stringify(log) : log;
     }
@@ -18,7 +17,6 @@ class IvyLog {
             log: this.log,
             time: this.time,
             persist: this.persist,
-            instanceUid: this.instanceUid,
             jsonParsable: this.jsonParsable,
         };
     }

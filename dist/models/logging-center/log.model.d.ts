@@ -4,8 +4,7 @@ export declare class IvyLog implements IPostLogConfig {
     readonly key: string;
     readonly log: string;
     readonly time: number;
-    readonly instanceUid: string;
     readonly jsonParsable?: boolean;
-    constructor(log: string | object, key: string, instanceUid: string);
+    constructor(log: string | object, key: string);
     toJSON(): IPostLogConfig;
 }

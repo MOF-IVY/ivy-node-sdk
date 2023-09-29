@@ -11,7 +11,7 @@ export class InstanceLoggingCenterService extends BaseWebsocketService {
     persist: boolean;
   }[] = [];
 
-  constructor(address: string, private readonly instanceUid: string) {
+  constructor(address: string) {
     super(address);
     interval(100)
       .pipe(
@@ -20,8 +20,8 @@ export class InstanceLoggingCenterService extends BaseWebsocketService {
         tap(({ message }) => console.log(message)),
         tap(({ persist, message, key }) => {
           const logObject = persist
-            ? new IvyStoredLog(message, key, this.instanceUid)
-            : new IvyLog(message, key, this.instanceUid);
+            ? new IvyStoredLog(message, key)
+            : new IvyLog(message, key);
 
           this.socket.once('post-log-error', (error: IStandardWsError) =>
             console.error(`Error posting log: ${error.error}`),

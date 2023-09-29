@@ -1,9 +1,9 @@
+import { Observable } from 'rxjs';
 import { ExchangesMarkets } from '../models/common/exchanges-markets.type';
 import { ExchangeOperationType } from '../models/common/exchange-operation-type';
 import { ITraderOpenOrderOpts } from '../models/trader/open-order-config.model';
 import { ITraderCloseOrderOpts } from '../models/trader/close-order-config.model';
 import { IHistoryLoadRequestOpts } from '../models/history-loader/history-load-request.model';
-import { Observable } from 'rxjs';
 export interface ISDKConfigOpts {
     apiKey?: string;
     instanceUid?: string;
@@ -16,7 +16,6 @@ export interface ISDKConfigOpts {
 }
 export declare class IvySDK {
     private readonly apiKey;
-    private readonly instanceUid;
     private readonly gatewayWSApiAddress;
     private readonly gatewayRESTApiAddress;
     private readonly instanceSSMWSApiAddress;

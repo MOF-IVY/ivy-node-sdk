@@ -1,3 +1,4 @@
+import { Observable, filter, map, zip } from 'rxjs';
 import { ENVConfig } from './config/config/config.core';
 
 import { ExchangesMarkets } from '../models/common/exchanges-markets.type';
@@ -12,7 +13,6 @@ import { InstanceLoggingCenterService } from './services/instance/logging-center
 import { ITraderOpenOrderOpts } from '../models/trader/open-order-config.model';
 import { ITraderCloseOrderOpts } from '../models/trader/close-order-config.model';
 import { IHistoryLoadRequestOpts } from '../models/history-loader/history-load-request.model';
-import { BehaviorSubject, Observable, filter, map, zip } from 'rxjs';
 
 export interface ISDKConfigOpts {
   apiKey?: string;
@@ -29,7 +29,6 @@ export interface ISDKConfigOpts {
 
 export class IvySDK {
   private readonly apiKey: string;
-  private readonly instanceUid: string;
   private readonly gatewayWSApiAddress: string;
   private readonly gatewayRESTApiAddress: string;
   private readonly instanceSSMWSApiAddress: string;
@@ -45,8 +44,6 @@ export class IvySDK {
 
   constructor(opts?: ISDKConfigOpts) {
     this.apiKey = opts?.apiKey ?? ENVConfig.scriptApiKey;
-
-    this.instanceUid = opts?.instanceUid ?? ENVConfig.scriptUid;
 
     this.gatewayWSApiAddress =
       opts?.gatewayWsApiAddress ?? 'ws://api.ivy.cryptobeam.net';
@@ -69,7 +66,6 @@ export class IvySDK {
       'ws://ivy-history-loader:3000/history-loader';
 
     console.log({
-      instanceUid: this.instanceUid,
       gatewayWSApiAddress: this.gatewayWSApiAddress,
       gatewayRESTApiAddress: this.gatewayRESTApiAddress,
       instanceSSMWSApiAddress: this.instanceSSMWSApiAddress,
@@ -90,7 +86,6 @@ export class IvySDK {
     );
     this.loggingCenter = new InstanceLoggingCenterService(
       this.instanceLoggingCenterWSApiAddress,
-      this.instanceUid,
     );
     this.historyLoader = new InstanceHistoryLoaderService(
       this.instanceHistoryLoaderWSApiAddress,
@@ -193,11 +188,6 @@ export class IvySDK {
     if (!this.apiKey)
       throw new Error(
         "API key is missing. Either pass it via config or via environment at 'IVY_SCRIPT_API_KEY'",
-      );
-
-    if (!this.instanceUid)
-      throw new Error(
-        "Script uid is missing. Either pass it via config or via environment at 'IVY_SCRIPT_UID'",
       );
 
     if (!this.gatewayWSApiAddress)

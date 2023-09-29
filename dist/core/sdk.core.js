@@ -1,32 +1,30 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.IvySDK = void 0;
+const rxjs_1 = require("rxjs");
 const config_core_1 = require("./config/config/config.core");
 const ssm_service_1 = require("./services/instance/ssm.service");
 const trader_service_1 = require("./services/instance/trader.service");
 const pumpdump_service_1 = require("./services/gateway/pumpdump.service");
 const history_loader_service_1 = require("./services/instance/history-loader.service");
 const logging_center_service_1 = require("./services/instance/logging-center.service");
-const rxjs_1 = require("rxjs");
 class IvySDK {
     constructor(opts) {
-        var _a, _b, _c, _d, _e, _f, _g, _h;
+        var _a, _b, _c, _d, _e, _f, _g;
         this.apiKey = (_a = opts === null || opts === void 0 ? void 0 : opts.apiKey) !== null && _a !== void 0 ? _a : config_core_1.ENVConfig.scriptApiKey;
-        this.instanceUid = (_b = opts === null || opts === void 0 ? void 0 : opts.instanceUid) !== null && _b !== void 0 ? _b : config_core_1.ENVConfig.scriptUid;
         this.gatewayWSApiAddress =
-            (_c = opts === null || opts === void 0 ? void 0 : opts.gatewayWsApiAddress) !== null && _c !== void 0 ? _c : 'ws://api.ivy.cryptobeam.net';
+            (_b = opts === null || opts === void 0 ? void 0 : opts.gatewayWsApiAddress) !== null && _b !== void 0 ? _b : 'ws://api.ivy.cryptobeam.net';
         this.gatewayRESTApiAddress =
-            (_d = opts === null || opts === void 0 ? void 0 : opts.gatewayRestApiAddress) !== null && _d !== void 0 ? _d : 'https://api.ivy.cryptobeam.net/api/v1/';
+            (_c = opts === null || opts === void 0 ? void 0 : opts.gatewayRestApiAddress) !== null && _c !== void 0 ? _c : 'https://api.ivy.cryptobeam.net/api/v1/';
         this.instanceSSMWSApiAddress =
-            (_e = opts === null || opts === void 0 ? void 0 : opts.instanceSSMWsApiAddress) !== null && _e !== void 0 ? _e : 'http://ivy-ssm:3000/ssm';
+            (_d = opts === null || opts === void 0 ? void 0 : opts.instanceSSMWsApiAddress) !== null && _d !== void 0 ? _d : 'http://ivy-ssm:3000/ssm';
         this.instanceTraderRestApiAddress =
-            (_f = opts === null || opts === void 0 ? void 0 : opts.instanceTraderRestApiAddress) !== null && _f !== void 0 ? _f : 'http://ivy-trader:3000';
+            (_e = opts === null || opts === void 0 ? void 0 : opts.instanceTraderRestApiAddress) !== null && _e !== void 0 ? _e : 'http://ivy-trader:3000';
         this.instanceLoggingCenterWSApiAddress =
-            (_g = opts === null || opts === void 0 ? void 0 : opts.instanceLoggingCenterWsApiAddress) !== null && _g !== void 0 ? _g : 'ws://ivy-logging-center:3000/logging-center';
+            (_f = opts === null || opts === void 0 ? void 0 : opts.instanceLoggingCenterWsApiAddress) !== null && _f !== void 0 ? _f : 'ws://ivy-logging-center:3000/logging-center';
         this.instanceHistoryLoaderWSApiAddress =
-            (_h = opts === null || opts === void 0 ? void 0 : opts.instanceHistoryLoaderWsApiAddress) !== null && _h !== void 0 ? _h : 'ws://ivy-history-loader:3000/history-loader';
+            (_g = opts === null || opts === void 0 ? void 0 : opts.instanceHistoryLoaderWsApiAddress) !== null && _g !== void 0 ? _g : 'ws://ivy-history-loader:3000/history-loader';
         console.log({
-            instanceUid: this.instanceUid,
             gatewayWSApiAddress: this.gatewayWSApiAddress,
             gatewayRESTApiAddress: this.gatewayRESTApiAddress,
             instanceSSMWSApiAddress: this.instanceSSMWSApiAddress,
@@ -38,7 +36,7 @@ class IvySDK {
         this.SSM = new ssm_service_1.InstanceSSMService(this.instanceSSMWSApiAddress);
         this.pumpdump = new pumpdump_service_1.GatewayPumpDumpService(`${this.gatewayWSApiAddress}/pumpdump`);
         this.trader = new trader_service_1.InstanceTraderService(this.instanceTraderRestApiAddress, this.apiKey);
-        this.loggingCenter = new logging_center_service_1.InstanceLoggingCenterService(this.instanceLoggingCenterWSApiAddress, this.instanceUid);
+        this.loggingCenter = new logging_center_service_1.InstanceLoggingCenterService(this.instanceLoggingCenterWSApiAddress);
         this.historyLoader = new history_loader_service_1.InstanceHistoryLoaderService(this.instanceHistoryLoaderWSApiAddress);
     }
     subscribeReady() {
@@ -104,8 +102,6 @@ class IvySDK {
     ensureRequiredParametersOrThrow() {
         if (!this.apiKey)
             throw new Error("API key is missing. Either pass it via config or via environment at 'IVY_SCRIPT_API_KEY'");
-        if (!this.instanceUid)
-            throw new Error("Script uid is missing. Either pass it via config or via environment at 'IVY_SCRIPT_UID'");
         if (!this.gatewayWSApiAddress)
             throw new Error('Gateway websocket address is missing. Do not specify it in the config to use the default one');
         if (!this.gatewayRESTApiAddress)
