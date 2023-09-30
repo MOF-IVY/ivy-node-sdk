@@ -17,5 +17,7 @@ export class InstanceLoggingCenterService extends BaseWebsocketService {
       console.error(`Error posting log: ${error.error}`),
     );
     this.socket.emit('post-log', logObject.toJSON());
+
+    console.log(logObject.key, logObject.log);
   }
 }
