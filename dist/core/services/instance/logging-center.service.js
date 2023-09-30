@@ -4,23 +4,16 @@ exports.InstanceLoggingCenterService = void 0;
 const ws_service_1 = require("../base/ws.service");
 const log_model_1 = require("../../../models/logging-center/log.model");
 const stored_log_model_1 = require("../../../models/logging-center/stored-log.model");
-const rxjs_1 = require("rxjs");
 class InstanceLoggingCenterService extends ws_service_1.BaseWebsocketService {
     constructor(address) {
         super(address);
-        this.logsQueue = [];
-        (0, rxjs_1.interval)(100)
-            .pipe((0, rxjs_1.filter)(() => !!this.logsQueue.length), (0, rxjs_1.map)(() => this.logsQueue.shift()), (0, rxjs_1.tap)(({ message }) => console.log(message)), (0, rxjs_1.tap)(({ persist, message, key }) => {
-            const logObject = persist
-                ? new stored_log_model_1.IvyStoredLog(message, key)
-                : new log_model_1.IvyLog(message, key);
-            this.socket.once('post-log-error', (error) => console.error(`Error posting log: ${error.error}`));
-            this.socket.emit('post-log', logObject.toJSON());
-        }))
-            .subscribe();
     }
     postLog(message, key, persist) {
-        this.logsQueue.push({ message, key, persist });
+        const logObject = persist
+            ? new stored_log_model_1.IvyStoredLog(message, key)
+            : new log_model_1.IvyLog(message, key);
+        this.socket.once('post-log-error', (error) => console.error(`Error posting log: ${error.error}`));
+        this.socket.emit('post-log', logObject.toJSON());
     }
 }
 exports.InstanceLoggingCenterService = InstanceLoggingCenterService;
