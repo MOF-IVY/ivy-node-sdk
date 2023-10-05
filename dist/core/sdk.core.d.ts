@@ -10,6 +10,7 @@ export interface ISDKConfigOpts {
     gatewayWsApiAddress?: string;
     gatewayRestApiAddress?: string;
     instanceSSMWsApiAddress?: string;
+    instanceTraderWsApiAddress?: string;
     instanceTraderRestApiAddress?: string;
     instanceLoggingCenterWsApiAddress?: string;
     instanceHistoryLoaderWsApiAddress?: string;
@@ -19,6 +20,7 @@ export declare class IvySDK {
     private readonly gatewayWSApiAddress;
     private readonly gatewayRESTApiAddress;
     private readonly instanceSSMWSApiAddress;
+    private readonly instanceTraderWsApiAddress;
     private readonly instanceTraderRestApiAddress;
     private readonly instanceLoggingCenterWSApiAddress;
     private readonly instanceHistoryLoaderWSApiAddress;
@@ -36,6 +38,8 @@ export declare class IvySDK {
     closeOperation(opts: ITraderCloseOrderOpts): Promise<import("../main").ITraderOperation<unknown>>;
     hasOperationOpen(xm: ExchangesMarkets, symbol: string, type: ExchangeOperationType): Promise<boolean>;
     getClosedOperation(operationId: string): Promise<import("../main").ITraderOperation<unknown>>;
+    enableActiveStatsUpdate(): Promise<void | import("./services/base/ws.service").IStandardWsError>;
+    subscribeActiveStatsUpdates(): Observable<import("./services/instance/trader.service").IActiveStatsUpdate>;
     enableIKStream(): Promise<void | import("./services/base/ws.service").IStandardWsError>;
     disableIKStream(): Promise<void | import("./services/base/ws.service").IStandardWsError>;
     subscribeIKStream(): Observable<import("../main").IFKEvent>;

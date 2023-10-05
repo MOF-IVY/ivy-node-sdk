@@ -14,15 +14,30 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.InstanceTraderService = void 0;
 const axios_1 = __importDefault(require("axios"));
-class InstanceTraderService {
-    constructor(address, apiKey) {
+const ws_service_1 = require("../base/ws.service");
+const rxjs_1 = require("rxjs");
+class InstanceTraderService extends ws_service_1.BaseWebsocketService {
+    constructor(restAddress, wsAddress, apiKey) {
+        super(wsAddress);
+        this.activeStatsUpdates$ = new rxjs_1.Subject();
         this.httpClient = axios_1.default.create({
-            baseURL: address,
+            baseURL: restAddress,
             headers: {
                 Authorization: `Bearer ${apiKey}`,
                 'Content-Type': 'application/json',
             },
         });
+    }
+    enableActiveStatsUpdates() {
+        return new Promise((resolve) => {
+            this.socket.on('active-stats-event', this.activeStatsEventHandler.bind(this));
+            this.socket.once('subscribe-active-stats-update-error', (error) => resolve(error));
+            this.socket.once('subscribe-active-stats-update-success', () => resolve());
+            this.safeEmitWithReconnect('subscribe-active-stats-update');
+        });
+    }
+    subscribeActiveStatsUpdates() {
+        return this.activeStatsUpdates$.asObservable();
     }
     hasOperationOpen(xm, symbol, type) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -95,6 +110,9 @@ class InstanceTraderService {
             }
             return resp.data.data;
         });
+    }
+    activeStatsEventHandler(data) {
+        this.activeStatsUpdates$.next(data);
     }
 }
 exports.InstanceTraderService = InstanceTraderService;

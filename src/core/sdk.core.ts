@@ -22,6 +22,7 @@ export interface ISDKConfigOpts {
   gatewayRestApiAddress?: string;
 
   instanceSSMWsApiAddress?: string;
+  instanceTraderWsApiAddress?: string;
   instanceTraderRestApiAddress?: string;
   instanceLoggingCenterWsApiAddress?: string;
   instanceHistoryLoaderWsApiAddress?: string;
@@ -32,6 +33,7 @@ export class IvySDK {
   private readonly gatewayWSApiAddress: string;
   private readonly gatewayRESTApiAddress: string;
   private readonly instanceSSMWSApiAddress: string;
+  private readonly instanceTraderWsApiAddress: string;
   private readonly instanceTraderRestApiAddress: string;
   private readonly instanceLoggingCenterWSApiAddress: string;
   private readonly instanceHistoryLoaderWSApiAddress: string;
@@ -54,6 +56,9 @@ export class IvySDK {
     this.instanceSSMWSApiAddress =
       opts?.instanceSSMWsApiAddress ?? 'http://ivy-ssm:3000/ssm';
 
+    this.instanceTraderWsApiAddress =
+      opts?.instanceTraderWsApiAddress ?? 'http://ivy-trader:3000/trader';
+
     this.instanceTraderRestApiAddress =
       opts?.instanceTraderRestApiAddress ?? 'http://ivy-trader:3000';
 
@@ -69,6 +74,7 @@ export class IvySDK {
       gatewayWSApiAddress: this.gatewayWSApiAddress,
       gatewayRESTApiAddress: this.gatewayRESTApiAddress,
       instanceSSMWSApiAddress: this.instanceSSMWSApiAddress,
+      instanceTraderWsApiAddress: this.instanceTraderWsApiAddress,
       instanceTraderRestApiAddress: this.instanceTraderRestApiAddress,
       instanceLoggingCenterWSApiAddress: this.instanceLoggingCenterWSApiAddress,
       instanceHistoryLoaderWSApiAddress: this.instanceHistoryLoaderWSApiAddress,
@@ -82,6 +88,7 @@ export class IvySDK {
     );
     this.trader = new InstanceTraderService(
       this.instanceTraderRestApiAddress,
+      this.instanceTraderWsApiAddress,
       this.apiKey,
     );
     this.loggingCenter = new InstanceLoggingCenterService(
@@ -95,11 +102,14 @@ export class IvySDK {
   subscribeReady(): Observable<boolean> {
     return zip(
       this.SSM.subscribeReady(),
+      this.trader.subscribeReady(),
       this.pumpdump.subscribeReady(),
       this.historyLoader.subscribeReady(),
       this.loggingCenter.subscribeReady(),
     ).pipe(
-      filter(([ssm, pd, hl, lc]) => !!hl && !!lc && !!pd && !!ssm),
+      filter(
+        ([ssm, trd, pd, hl, lc]) => !!ssm && !!trd && !!pd && !!hl && !!lc,
+      ),
       map(() => true),
     );
   }
@@ -134,6 +144,14 @@ export class IvySDK {
 
   getClosedOperation(operationId: string) {
     return this.trader.getClosedOperation(operationId);
+  }
+
+  enableActiveStatsUpdate() {
+    return this.trader.enableActiveStatsUpdates();
+  }
+
+  subscribeActiveStatsUpdates() {
+    return this.trader.subscribeActiveStatsUpdates();
   }
 
   enableIKStream() {
@@ -203,6 +221,11 @@ export class IvySDK {
     if (!this.instanceSSMWSApiAddress)
       throw new Error(
         'SSM websocket address is missing. Do not specify it in the config to use the default one',
+      );
+
+    if (!this.instanceTraderWsApiAddress)
+      throw new Error(
+        'Trader websocket address is missing. Do not specify it in the config to use the default one',
       );
 
     if (!this.instanceTraderRestApiAddress)

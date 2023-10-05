@@ -3,22 +3,56 @@ import axios, { Axios } from 'axios';
 import { ExchangesMarkets } from '../../../models/common/exchanges-markets.type';
 import { ExchangeOperationType } from '../../../models/common/exchange-operation-type';
 
-import { ITraderOperation } from '../../../models/trader/operation.model';
+import {
+  IOperationStats,
+  ITraderOperation,
+} from '../../../models/trader/operation.model';
 import { IBaseResponse } from '../../../models/common/base-response.model';
 import { ITraderOpenOrderOpts } from '../../../models/trader/open-order-config.model';
 import { ITraderCloseOrderOpts } from '../../../models/trader/close-order-config.model';
+import { BaseWebsocketService, IStandardWsError } from '../base/ws.service';
+import { Observable, Subject } from 'rxjs';
 
-export class InstanceTraderService {
+export interface IActiveStatsUpdate {
+  sym: string;
+  xm: ExchangesMarkets;
+  stats: IOperationStats;
+}
+
+export class InstanceTraderService extends BaseWebsocketService {
   private readonly httpClient: Axios;
+  private readonly activeStatsUpdates$ = new Subject<IActiveStatsUpdate>();
 
-  constructor(address: string, apiKey: string) {
+  constructor(restAddress: string, wsAddress: string, apiKey: string) {
+    super(wsAddress);
     this.httpClient = axios.create({
-      baseURL: address,
+      baseURL: restAddress,
       headers: {
         Authorization: `Bearer ${apiKey}`,
         'Content-Type': 'application/json',
       },
     });
+  }
+
+  enableActiveStatsUpdates(): Promise<void | IStandardWsError> {
+    return new Promise((resolve) => {
+      this.socket.on(
+        'active-stats-event',
+        this.activeStatsEventHandler.bind(this),
+      );
+      this.socket.once(
+        'subscribe-active-stats-update-error',
+        (error: IStandardWsError) => resolve(error),
+      );
+      this.socket.once('subscribe-active-stats-update-success', () =>
+        resolve(),
+      );
+      this.safeEmitWithReconnect('subscribe-active-stats-update');
+    });
+  }
+
+  subscribeActiveStatsUpdates(): Observable<IActiveStatsUpdate> {
+    return this.activeStatsUpdates$.asObservable();
   }
 
   async hasOperationOpen(
@@ -117,5 +151,13 @@ export class InstanceTraderService {
       );
     }
     return resp.data.data!;
+  }
+
+  private activeStatsEventHandler(data: {
+    sym: string;
+    xm: ExchangesMarkets;
+    stats: IOperationStats;
+  }) {
+    this.activeStatsUpdates$.next(data);
   }
 }
