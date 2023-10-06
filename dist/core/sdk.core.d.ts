@@ -9,11 +9,11 @@ export interface ISDKConfigOpts {
     instanceUid?: string;
     gatewayWsApiAddress?: string;
     gatewayRestApiAddress?: string;
-    instanceSSMWsApiAddress?: string;
-    instanceTraderWsApiAddress?: string;
-    instanceTraderRestApiAddress?: string;
-    instanceLoggingCenterWsApiAddress?: string;
-    instanceHistoryLoaderWsApiAddress?: string;
+    instanceSSMWsApiAddress?: string | null;
+    instanceTraderWsApiAddress?: string | null;
+    instanceTraderRestApiAddress?: string | null;
+    instanceLoggingCenterWsApiAddress?: string | null;
+    instanceHistoryLoaderWsApiAddress?: string | null;
 }
 export declare class IvySDK {
     private readonly apiKey;

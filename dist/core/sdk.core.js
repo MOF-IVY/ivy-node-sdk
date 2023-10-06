@@ -17,15 +17,25 @@ class IvySDK {
         this.gatewayRESTApiAddress =
             (_c = opts === null || opts === void 0 ? void 0 : opts.gatewayRestApiAddress) !== null && _c !== void 0 ? _c : 'https://api.ivy.cryptobeam.net/api/v1/';
         this.instanceSSMWSApiAddress =
-            (_d = opts === null || opts === void 0 ? void 0 : opts.instanceSSMWsApiAddress) !== null && _d !== void 0 ? _d : 'http://ivy-ssm:3000/ssm';
+            (opts === null || opts === void 0 ? void 0 : opts.instanceSSMWsApiAddress) === null
+                ? null
+                : (_d = opts === null || opts === void 0 ? void 0 : opts.instanceSSMWsApiAddress) !== null && _d !== void 0 ? _d : 'http://ivy-ssm:3000/ssm';
         this.instanceTraderWsApiAddress =
-            (_e = opts === null || opts === void 0 ? void 0 : opts.instanceTraderWsApiAddress) !== null && _e !== void 0 ? _e : 'http://ivy-trader:3000/trader';
+            (opts === null || opts === void 0 ? void 0 : opts.instanceTraderWsApiAddress) === null
+                ? null
+                : (_e = opts === null || opts === void 0 ? void 0 : opts.instanceTraderWsApiAddress) !== null && _e !== void 0 ? _e : 'http://ivy-trader:3000/trader';
         this.instanceTraderRestApiAddress =
-            (_f = opts === null || opts === void 0 ? void 0 : opts.instanceTraderRestApiAddress) !== null && _f !== void 0 ? _f : 'http://ivy-trader:3000';
+            (opts === null || opts === void 0 ? void 0 : opts.instanceTraderRestApiAddress) === null
+                ? null
+                : (_f = opts === null || opts === void 0 ? void 0 : opts.instanceTraderRestApiAddress) !== null && _f !== void 0 ? _f : 'http://ivy-trader:3000';
         this.instanceLoggingCenterWSApiAddress =
-            (_g = opts === null || opts === void 0 ? void 0 : opts.instanceLoggingCenterWsApiAddress) !== null && _g !== void 0 ? _g : 'ws://ivy-logging-center:3000/logging-center';
+            (opts === null || opts === void 0 ? void 0 : opts.instanceLoggingCenterWsApiAddress) === null
+                ? null
+                : (_g = opts === null || opts === void 0 ? void 0 : opts.instanceLoggingCenterWsApiAddress) !== null && _g !== void 0 ? _g : 'ws://ivy-logging-center:3000/logging-center';
         this.instanceHistoryLoaderWSApiAddress =
-            (_h = opts === null || opts === void 0 ? void 0 : opts.instanceHistoryLoaderWsApiAddress) !== null && _h !== void 0 ? _h : 'ws://ivy-history-loader:3000/history-loader';
+            (opts === null || opts === void 0 ? void 0 : opts.instanceHistoryLoaderWsApiAddress) === null
+                ? null
+                : (_h = opts === null || opts === void 0 ? void 0 : opts.instanceHistoryLoaderWsApiAddress) !== null && _h !== void 0 ? _h : 'ws://ivy-history-loader:3000/history-loader';
         console.log({
             gatewayWSApiAddress: this.gatewayWSApiAddress,
             gatewayRESTApiAddress: this.gatewayRESTApiAddress,
@@ -36,58 +46,107 @@ class IvySDK {
             instanceHistoryLoaderWSApiAddress: this.instanceHistoryLoaderWSApiAddress,
         });
         this.ensureRequiredParametersOrThrow();
-        this.SSM = new ssm_service_1.InstanceSSMService(this.instanceSSMWSApiAddress);
+        if (this.instanceSSMWSApiAddress)
+            this.SSM = new ssm_service_1.InstanceSSMService(this.instanceSSMWSApiAddress);
+        else
+            this.SSM = null;
         this.pumpdump = new pumpdump_service_1.GatewayPumpDumpService(`${this.gatewayWSApiAddress}/pumpdump`);
-        this.trader = new trader_service_1.InstanceTraderService(this.instanceTraderRestApiAddress, this.instanceTraderWsApiAddress, this.apiKey);
-        this.loggingCenter = new logging_center_service_1.InstanceLoggingCenterService(this.instanceLoggingCenterWSApiAddress);
-        this.historyLoader = new history_loader_service_1.InstanceHistoryLoaderService(this.instanceHistoryLoaderWSApiAddress);
+        if (this.instanceTraderRestApiAddress && this.instanceTraderWsApiAddress)
+            this.trader = new trader_service_1.InstanceTraderService(this.instanceTraderRestApiAddress, this.instanceTraderWsApiAddress, this.apiKey);
+        else
+            this.trader = null;
+        if (this.instanceLoggingCenterWSApiAddress)
+            this.loggingCenter = new logging_center_service_1.InstanceLoggingCenterService(this.instanceLoggingCenterWSApiAddress);
+        else
+            this.loggingCenter = null;
+        if (this.instanceHistoryLoaderWSApiAddress)
+            this.historyLoader = new history_loader_service_1.InstanceHistoryLoaderService(this.instanceHistoryLoaderWSApiAddress);
+        else
+            this.historyLoader = null;
     }
     subscribeReady() {
-        return (0, rxjs_1.zip)(this.SSM.subscribeReady(), this.trader.subscribeReady(), this.pumpdump.subscribeReady(), this.historyLoader.subscribeReady(), this.loggingCenter.subscribeReady()).pipe((0, rxjs_1.filter)(([ssm, trd, pd, hl, lc]) => !!ssm && !!trd && !!pd && !!hl && !!lc), (0, rxjs_1.map)(() => true));
+        return (0, rxjs_1.zip)(this.pumpdump.subscribeReady(), this.instanceSSMWSApiAddress !== null
+            ? this.SSM.subscribeReady()
+            : (0, rxjs_1.of)(true), this.instanceTraderWsApiAddress !== null &&
+            this.instanceTraderRestApiAddress !== null
+            ? this.trader.subscribeReady()
+            : (0, rxjs_1.of)(true), this.instanceHistoryLoaderWSApiAddress !== null
+            ? this.historyLoader.subscribeReady()
+            : (0, rxjs_1.of)(true), this.instanceLoggingCenterWSApiAddress !== null
+            ? this.loggingCenter.subscribeReady()
+            : (0, rxjs_1.of)(true)).pipe((0, rxjs_1.filter)(([ssm, trd, pd, hl, lc]) => !!ssm && !!trd && !!pd && !!hl && !!lc), (0, rxjs_1.map)(() => true));
     }
     clearLogs(keys) {
         throw new Error('Not implemented');
     }
     log(message, key, persist = false) {
+        if (this.loggingCenter === null)
+            throw new Error(`Logging center service disabled`);
         return this.loggingCenter.postLog(message, key, persist);
     }
     loadHistory(opts) {
+        if (this.historyLoader === null)
+            throw new Error(`History loading service disabled`);
         return this.historyLoader.loadHistory(opts);
     }
     newOperation(opts) {
+        if (this.trader === null)
+            throw new Error(`Trader service disabled`);
         return this.trader.createNewOperation(opts);
     }
     closeOperation(opts) {
+        if (this.trader === null)
+            throw new Error(`Trader service disabled`);
         return this.trader.closeOperation(opts);
     }
     hasOperationOpen(xm, symbol, type) {
+        if (this.trader === null)
+            throw new Error(`Trader service disabled`);
         return this.trader.hasOperationOpen(xm, symbol, type);
     }
     getClosedOperation(operationId) {
+        if (this.trader === null)
+            throw new Error(`Trader service disabled`);
         return this.trader.getClosedOperation(operationId);
     }
     enableActiveStatsUpdate() {
+        if (this.trader === null)
+            throw new Error(`Trader service disabled`);
         return this.trader.enableActiveStatsUpdates();
     }
     subscribeActiveStatsUpdates() {
+        if (this.trader === null)
+            throw new Error(`Trader service disabled`);
         return this.trader.subscribeActiveStatsUpdates();
     }
     enableIKStream() {
+        if (this.SSM === null)
+            throw new Error(`SSM service disabled`);
         return this.SSM.enableIKStream();
     }
     disableIKStream() {
+        if (this.SSM === null)
+            throw new Error(`SSM service disabled`);
         return this.SSM.disableIKStream();
     }
     subscribeIKStream() {
+        if (this.SSM === null)
+            throw new Error(`SSM service disabled`);
         return this.SSM.subscribeIKStream();
     }
     enableFKStream() {
+        if (this.SSM === null)
+            throw new Error(`SSM service disabled`);
         return this.SSM.enableFKStream();
     }
     disableFKStream() {
+        if (this.SSM === null)
+            throw new Error(`SSM service disabled`);
         return this.SSM.disableFKStream();
     }
     subscribeFKStream() {
+        if (this.SSM === null)
+            throw new Error(`SSM service disabled`);
         return this.SSM.subscribeFKStream();
     }
     enablePumpStream(payload) {
@@ -115,15 +174,19 @@ class IvySDK {
             throw new Error('Gateway websocket address is missing. Do not specify it in the config to use the default one');
         if (!this.gatewayRESTApiAddress)
             throw new Error('Gateway REST address is missing. Do not specify it in the config to use the default one');
-        if (!this.instanceSSMWSApiAddress)
+        if (this.instanceSSMWSApiAddress !== null && !this.instanceSSMWSApiAddress)
             throw new Error('SSM websocket address is missing. Do not specify it in the config to use the default one');
-        if (!this.instanceTraderWsApiAddress)
+        if (this.instanceTraderWsApiAddress !== null &&
+            !this.instanceTraderWsApiAddress)
             throw new Error('Trader websocket address is missing. Do not specify it in the config to use the default one');
-        if (!this.instanceTraderRestApiAddress)
+        if (this.instanceTraderRestApiAddress !== null &&
+            !this.instanceTraderRestApiAddress)
             throw new Error('Trader REST address is missing. Do not specify it in the config to use the default one');
-        if (!this.instanceLoggingCenterWSApiAddress)
+        if (this.instanceLoggingCenterWSApiAddress !== null &&
+            !this.instanceLoggingCenterWSApiAddress)
             throw new Error('Logging center websocket address is missing. Do not specify it in the config to use the default one');
-        if (!this.instanceHistoryLoaderWSApiAddress)
+        if (this.instanceHistoryLoaderWSApiAddress !== null &&
+            !this.instanceHistoryLoaderWSApiAddress)
             throw new Error('History loader websocket address is missing. Do not specify it in the config to use the default one');
     }
 }
