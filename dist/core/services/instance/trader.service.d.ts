@@ -12,15 +12,19 @@ export interface IActiveStatsUpdate {
 }
 export declare class InstanceTraderService extends BaseWebsocketService {
     private readonly httpClient;
+    private readonly closedOpsUpdates$;
     private readonly activeStatsUpdates$;
     constructor(restAddress: string, wsAddress: string, apiKey: string);
     enableActiveStatsUpdates(): Promise<void | IStandardWsError>;
+    enableClosedOperationsUpdates(): Promise<void | IStandardWsError>;
     subscribeActiveStatsUpdates(): Observable<IActiveStatsUpdate>;
+    subscribeClosedOperationsUpdates(): Observable<ITraderOperation>;
     hasOperationOpen(xm: ExchangesMarkets, symbol: string, type: ExchangeOperationType): Promise<boolean>;
     getClosedOperation(operationId: string): Promise<ITraderOperation>;
     createNewOperation(opts: ITraderOpenOrderOpts): Promise<ITraderOperation>;
     closeOperation(opts: ITraderCloseOrderOpts): Promise<ITraderOperation>;
     cancelOpenOrder(operationId: string): Promise<boolean>;
     cancelCloseOrder(operationId: string): Promise<boolean>;
+    private closedOpEventHandler;
     private activeStatsEventHandler;
 }

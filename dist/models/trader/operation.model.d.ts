@@ -8,6 +8,8 @@ export interface ITraderOperation<OrderType = unknown> {
     issuerId: string;
     operationId: string;
     symbol: string;
+    isMock?: boolean;
+    leverage?: number;
     type: ExchangeOperationType;
     exchangeMarket: ExchangesMarkets;
     openOrderId: string;

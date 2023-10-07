@@ -19,6 +19,7 @@ const rxjs_1 = require("rxjs");
 class InstanceTraderService extends ws_service_1.BaseWebsocketService {
     constructor(restAddress, wsAddress, apiKey) {
         super(wsAddress);
+        this.closedOpsUpdates$ = new rxjs_1.Subject();
         this.activeStatsUpdates$ = new rxjs_1.Subject();
         this.httpClient = axios_1.default.create({
             baseURL: restAddress,
@@ -36,8 +37,19 @@ class InstanceTraderService extends ws_service_1.BaseWebsocketService {
             this.safeEmitWithReconnect('subscribe-active-stats-update');
         });
     }
+    enableClosedOperationsUpdates() {
+        return new Promise((resolve) => {
+            this.socket.on('closed-operation-event', this.closedOpEventHandler.bind(this));
+            this.socket.once('subscribe-closed-operations-updates-error', (error) => resolve(error));
+            this.socket.once('subscribe-closed-operations-updates-success', () => resolve());
+            this.safeEmitWithReconnect('subscribe-closed-operations-updates');
+        });
+    }
     subscribeActiveStatsUpdates() {
         return this.activeStatsUpdates$.asObservable();
+    }
+    subscribeClosedOperationsUpdates() {
+        return this.closedOpsUpdates$.asObservable();
     }
     hasOperationOpen(xm, symbol, type) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -110,6 +122,9 @@ class InstanceTraderService extends ws_service_1.BaseWebsocketService {
             }
             return resp.data.data;
         });
+    }
+    closedOpEventHandler(data) {
+        this.closedOpsUpdates$.next(data);
     }
     activeStatsEventHandler(data) {
         this.activeStatsUpdates$.next(data);

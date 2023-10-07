@@ -38,6 +38,8 @@ export declare class IvySDK {
     closeOperation(opts: ITraderCloseOrderOpts): Promise<import("../main").ITraderOperation<unknown>>;
     hasOperationOpen(xm: ExchangesMarkets, symbol: string, type: ExchangeOperationType): Promise<boolean>;
     getClosedOperation(operationId: string): Promise<import("../main").ITraderOperation<unknown>>;
+    enableClosedOperationsUpdates(): Promise<void | import("./services/base/ws.service").IStandardWsError>;
+    subscribeClosedOperationsUpdates(): Observable<import("../main").ITraderOperation<unknown>>;
     enableActiveStatsUpdate(): Promise<void | import("./services/base/ws.service").IStandardWsError>;
     subscribeActiveStatsUpdates(): Observable<import("./services/instance/trader.service").IActiveStatsUpdate>;
     enableIKStream(): Promise<void | import("./services/base/ws.service").IStandardWsError>;
