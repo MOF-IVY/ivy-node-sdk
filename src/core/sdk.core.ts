@@ -185,6 +185,16 @@ export class IvySDK {
     return this.trader.getClosedOperation(operationId);
   }
 
+  enableClosedOperationsUpdates() {
+    if (this.trader === null) throw new Error(`Trader service disabled`);
+    return this.trader.enableClosedOperationsUpdates();
+  }
+
+  subscribeClosedOperationsUpdates() {
+    if (this.trader === null) throw new Error(`Trader service disabled`);
+    return this.trader.subscribeClosedOperationsUpdates();
+  }
+
   enableActiveStatsUpdate() {
     if (this.trader === null) throw new Error(`Trader service disabled`);
     return this.trader.enableActiveStatsUpdates();

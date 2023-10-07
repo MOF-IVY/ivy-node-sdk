@@ -21,6 +21,7 @@ export interface IActiveStatsUpdate {
 
 export class InstanceTraderService extends BaseWebsocketService {
   private readonly httpClient: Axios;
+  private readonly closedOpsUpdates$ = new Subject<ITraderOperation>();
   private readonly activeStatsUpdates$ = new Subject<IActiveStatsUpdate>();
 
   constructor(restAddress: string, wsAddress: string, apiKey: string) {
@@ -51,8 +52,29 @@ export class InstanceTraderService extends BaseWebsocketService {
     });
   }
 
+  enableClosedOperationsUpdates(): Promise<void | IStandardWsError> {
+    return new Promise((resolve) => {
+      this.socket.on(
+        'closed-operation-event',
+        this.closedOpEventHandler.bind(this),
+      );
+      this.socket.once(
+        'subscribe-closed-operations-updates-error',
+        (error: IStandardWsError) => resolve(error),
+      );
+      this.socket.once('subscribe-closed-operations-updates-success', () =>
+        resolve(),
+      );
+      this.safeEmitWithReconnect('subscribe-closed-operations-updates');
+    });
+  }
+
   subscribeActiveStatsUpdates(): Observable<IActiveStatsUpdate> {
     return this.activeStatsUpdates$.asObservable();
+  }
+
+  subscribeClosedOperationsUpdates(): Observable<ITraderOperation> {
+    return this.closedOpsUpdates$.asObservable();
   }
 
   async hasOperationOpen(
@@ -151,6 +173,10 @@ export class InstanceTraderService extends BaseWebsocketService {
       );
     }
     return resp.data.data!;
+  }
+
+  private closedOpEventHandler(data: ITraderOperation) {
+    this.closedOpsUpdates$.next(data);
   }
 
   private activeStatsEventHandler(data: {
