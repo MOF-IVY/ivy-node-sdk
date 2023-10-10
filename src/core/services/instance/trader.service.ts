@@ -11,7 +11,7 @@ import { IBaseResponse } from '../../../models/common/base-response.model';
 import { ITraderOpenOrderOpts } from '../../../models/trader/open-order-config.model';
 import { ITraderCloseOrderOpts } from '../../../models/trader/close-order-config.model';
 import { BaseWebsocketService, IStandardWsError } from '../base/ws.service';
-import { Observable, Subject } from 'rxjs';
+import { Observable, Subject, filter, take, tap } from 'rxjs';
 
 export interface IActiveStatsUpdate {
   sym: string;
@@ -21,7 +21,12 @@ export interface IActiveStatsUpdate {
 
 export class InstanceTraderService extends BaseWebsocketService {
   private readonly httpClient: Axios;
+
+  private readonly openedOpsUpdates$ = new Subject<ITraderOperation>();
   private readonly closedOpsUpdates$ = new Subject<ITraderOperation>();
+  private readonly liquidatedOpsUpdates$ = new Subject<ITraderOperation>();
+  private readonly rejectedOrdersUpdates$ = new Subject<ITraderOperation>();
+
   private readonly activeStatsUpdates$ = new Subject<IActiveStatsUpdate>();
 
   constructor(restAddress: string, wsAddress: string, apiKey: string) {
@@ -33,6 +38,32 @@ export class InstanceTraderService extends BaseWebsocketService {
         'Content-Type': 'application/json',
       },
     });
+
+    super
+      .subscribeReady()
+      .pipe(
+        filter((ready) => !!ready),
+        take(1),
+        tap(() => {
+          this.socket.on(
+            'closed-operation-event',
+            this.closedOpEventHandler.bind(this),
+          );
+          this.socket.on(
+            'opened-operation-event',
+            this.openedOpEventHandler.bind(this),
+          );
+          this.socket.on(
+            'liquidation-event',
+            this.liquidatedOpEventHandler.bind(this),
+          );
+          this.socket.on(
+            'rejected-order-event',
+            this.rejectedOrdersEventHandler.bind(this),
+          );
+        }),
+      )
+      .subscribe();
   }
 
   enableActiveStatsUpdates(): Promise<void | IStandardWsError> {
@@ -52,29 +83,24 @@ export class InstanceTraderService extends BaseWebsocketService {
     });
   }
 
-  enableClosedOperationsUpdates(): Promise<void | IStandardWsError> {
-    return new Promise((resolve) => {
-      this.socket.on(
-        'closed-operation-event',
-        this.closedOpEventHandler.bind(this),
-      );
-      this.socket.once(
-        'subscribe-closed-operations-updates-error',
-        (error: IStandardWsError) => resolve(error),
-      );
-      this.socket.once('subscribe-closed-operations-updates-success', () =>
-        resolve(),
-      );
-      this.safeEmitWithReconnect('subscribe-closed-operations-updates');
-    });
-  }
-
   subscribeActiveStatsUpdates(): Observable<IActiveStatsUpdate> {
     return this.activeStatsUpdates$.asObservable();
   }
 
+  subscribeOpenedOperationsUpdates(): Observable<ITraderOperation> {
+    return this.openedOpsUpdates$.asObservable();
+  }
+
   subscribeClosedOperationsUpdates(): Observable<ITraderOperation> {
     return this.closedOpsUpdates$.asObservable();
+  }
+
+  subscribeLiquidatedOperationsUpdates(): Observable<ITraderOperation> {
+    return this.liquidatedOpsUpdates$.asObservable();
+  }
+
+  subscribeRejectedOrdersUpdates(): Observable<ITraderOperation> {
+    return this.rejectedOrdersUpdates$.asObservable();
   }
 
   async hasOperationOpen(
@@ -111,10 +137,8 @@ export class InstanceTraderService extends BaseWebsocketService {
     return resp.data.data!;
   }
 
-  async createNewOperation(
-    opts: ITraderOpenOrderOpts,
-  ): Promise<ITraderOperation> {
-    const resp = await this.httpClient.post<IBaseResponse<ITraderOperation>>(
+  async createNewOperation(opts: ITraderOpenOrderOpts): Promise<string | null> {
+    const resp = await this.httpClient.post<IBaseResponse<string | null>>(
       'trader/operation/new',
       opts,
     );
@@ -129,8 +153,8 @@ export class InstanceTraderService extends BaseWebsocketService {
     return resp.data.data!;
   }
 
-  async closeOperation(opts: ITraderCloseOrderOpts): Promise<ITraderOperation> {
-    const resp = await this.httpClient.post<IBaseResponse<ITraderOperation>>(
+  async closeOperation(opts: ITraderCloseOrderOpts): Promise<string | null> {
+    const resp = await this.httpClient.post<IBaseResponse<string | null>>(
       'trader/operation/close',
       opts,
     );
@@ -145,6 +169,12 @@ export class InstanceTraderService extends BaseWebsocketService {
     return resp.data.data!;
   }
 
+  /**
+   * DO NOT USE:
+   *
+   * Orders cancelling still needs workings on trader.
+   * Right now there's nothing preventing a double order cancel
+   */
   async cancelOpenOrder(operationId: string): Promise<boolean> {
     const resp = await this.httpClient.delete<IBaseResponse<boolean>>(
       `trader/operation/open-order/${operationId}`,
@@ -160,6 +190,12 @@ export class InstanceTraderService extends BaseWebsocketService {
     return resp.data.data!;
   }
 
+  /**
+   * DO NOT USE:
+   *
+   * Orders cancelling still needs workings on trader.
+   * Right now there's nothing preventing a double order cancel
+   */
   async cancelCloseOrder(operationId: string): Promise<boolean> {
     const resp = await this.httpClient.delete<IBaseResponse<boolean>>(
       `trader/operation/close-order/${operationId}`,
@@ -173,6 +209,18 @@ export class InstanceTraderService extends BaseWebsocketService {
       );
     }
     return resp.data.data!;
+  }
+
+  private liquidatedOpEventHandler(data: ITraderOperation) {
+    this.liquidatedOpsUpdates$.next(data);
+  }
+
+  private rejectedOrdersEventHandler(data: ITraderOperation) {
+    this.rejectedOrdersUpdates$.next(data);
+  }
+
+  private openedOpEventHandler(data: ITraderOperation) {
+    this.openedOpsUpdates$.next(data);
   }
 
   private closedOpEventHandler(data: ITraderOperation) {

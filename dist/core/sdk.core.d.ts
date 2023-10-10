@@ -34,20 +34,14 @@ export declare class IvySDK {
     clearLogs(keys: string[]): void;
     log(message: string | object, key: string, persist?: boolean): void;
     loadHistory(opts: IHistoryLoadRequestOpts): Promise<import("../main").IHistoryLoaded>;
-    newOperation(opts: ITraderOpenOrderOpts): Promise<import("../main").ITraderOperation<unknown>>;
-    closeOperation(opts: ITraderCloseOrderOpts): Promise<import("../main").ITraderOperation<unknown>>;
+    newOperation(opts: ITraderOpenOrderOpts): Promise<string | null>;
+    closeOperation(opts: ITraderCloseOrderOpts): Promise<string | null>;
     hasOperationOpen(xm: ExchangesMarkets, symbol: string, type: ExchangeOperationType): Promise<boolean>;
     getClosedOperation(operationId: string): Promise<import("../main").ITraderOperation<unknown>>;
-    enableClosedOperationsUpdates(): Promise<void | import("./services/base/ws.service").IStandardWsError>;
-    subscribeClosedOperationsUpdates(): Observable<import("../main").ITraderOperation<unknown>>;
-    enableActiveStatsUpdate(): Promise<void | import("./services/base/ws.service").IStandardWsError>;
-    subscribeActiveStatsUpdates(): Observable<import("./services/instance/trader.service").IActiveStatsUpdate>;
     enableIKStream(): Promise<void | import("./services/base/ws.service").IStandardWsError>;
     disableIKStream(): Promise<void | import("./services/base/ws.service").IStandardWsError>;
-    subscribeIKStream(): Observable<import("../main").IFKEvent>;
     enableFKStream(): Promise<void | import("./services/base/ws.service").IStandardWsError>;
     disableFKStream(): Promise<void | import("./services/base/ws.service").IStandardWsError>;
-    subscribeFKStream(): Observable<import("../main").IFKEvent>;
     enablePumpStream(payload: {
         xm: ExchangesMarkets;
         tfs: string[];
@@ -55,7 +49,6 @@ export declare class IvySDK {
     disablePumpStream(payload: {
         xm: ExchangesMarkets;
     }): Promise<void | import("./services/base/ws.service").IStandardWsError>;
-    subscribePumpStream(): Observable<import("../main").IPumpDumpEvent>;
     enableDumpStream(payload: {
         xm: ExchangesMarkets;
         tfs: string[];
@@ -63,6 +56,39 @@ export declare class IvySDK {
     disableDumpStream(payload: {
         xm: ExchangesMarkets;
     }): Promise<void | import("./services/base/ws.service").IStandardWsError>;
+    enableActiveStatsUpdate(): Promise<void | import("./services/base/ws.service").IStandardWsError>;
+    subscribeActiveStatsUpdates(): Observable<import("./services/instance/trader.service").IActiveStatsUpdate>;
+    /**
+     * Always active stream
+     */
+    subscribeOpenedOperationsUpdates(): Observable<import("../main").ITraderOperation<unknown>>;
+    /**
+     * Always active stream
+     */
+    subscribeClosedOperationsUpdates(): Observable<import("../main").ITraderOperation<unknown>>;
+    /**
+     * Always active stream
+     */
+    subscribeLiquidatedOperationsUpdates(): Observable<import("../main").ITraderOperation<unknown>>;
+    /**
+     * Always active stream
+     */
+    subscribeRejectedOrdersUpdates(): Observable<import("../main").ITraderOperation<unknown>>;
+    /**
+     * Stream active after activation request
+     */
+    subscribeIKStream(): Observable<import("../main").IFKEvent>;
+    /**
+     * Stream active after activation request
+     */
+    subscribeFKStream(): Observable<import("../main").IFKEvent>;
+    /**
+     * Stream active after activation request
+     */
+    subscribePumpStream(): Observable<import("../main").IPumpDumpEvent>;
+    /**
+     * Stream active after activation request
+     */
     subscribeDumpStream(): Observable<import("../main").IPumpDumpEvent>;
     private ensureRequiredParametersOrThrow;
 }

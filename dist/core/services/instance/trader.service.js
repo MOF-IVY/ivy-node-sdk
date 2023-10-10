@@ -19,7 +19,10 @@ const rxjs_1 = require("rxjs");
 class InstanceTraderService extends ws_service_1.BaseWebsocketService {
     constructor(restAddress, wsAddress, apiKey) {
         super(wsAddress);
+        this.openedOpsUpdates$ = new rxjs_1.Subject();
         this.closedOpsUpdates$ = new rxjs_1.Subject();
+        this.liquidatedOpsUpdates$ = new rxjs_1.Subject();
+        this.rejectedOrdersUpdates$ = new rxjs_1.Subject();
         this.activeStatsUpdates$ = new rxjs_1.Subject();
         this.httpClient = axios_1.default.create({
             baseURL: restAddress,
@@ -28,6 +31,15 @@ class InstanceTraderService extends ws_service_1.BaseWebsocketService {
                 'Content-Type': 'application/json',
             },
         });
+        super
+            .subscribeReady()
+            .pipe((0, rxjs_1.filter)((ready) => !!ready), (0, rxjs_1.take)(1), (0, rxjs_1.tap)(() => {
+            this.socket.on('closed-operation-event', this.closedOpEventHandler.bind(this));
+            this.socket.on('opened-operation-event', this.openedOpEventHandler.bind(this));
+            this.socket.on('liquidation-event', this.liquidatedOpEventHandler.bind(this));
+            this.socket.on('rejected-order-event', this.rejectedOrdersEventHandler.bind(this));
+        }))
+            .subscribe();
     }
     enableActiveStatsUpdates() {
         return new Promise((resolve) => {
@@ -37,19 +49,20 @@ class InstanceTraderService extends ws_service_1.BaseWebsocketService {
             this.safeEmitWithReconnect('subscribe-active-stats-update');
         });
     }
-    enableClosedOperationsUpdates() {
-        return new Promise((resolve) => {
-            this.socket.on('closed-operation-event', this.closedOpEventHandler.bind(this));
-            this.socket.once('subscribe-closed-operations-updates-error', (error) => resolve(error));
-            this.socket.once('subscribe-closed-operations-updates-success', () => resolve());
-            this.safeEmitWithReconnect('subscribe-closed-operations-updates');
-        });
-    }
     subscribeActiveStatsUpdates() {
         return this.activeStatsUpdates$.asObservable();
     }
+    subscribeOpenedOperationsUpdates() {
+        return this.openedOpsUpdates$.asObservable();
+    }
     subscribeClosedOperationsUpdates() {
         return this.closedOpsUpdates$.asObservable();
+    }
+    subscribeLiquidatedOperationsUpdates() {
+        return this.liquidatedOpsUpdates$.asObservable();
+    }
+    subscribeRejectedOrdersUpdates() {
+        return this.rejectedOrdersUpdates$.asObservable();
     }
     hasOperationOpen(xm, symbol, type) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -99,6 +112,12 @@ class InstanceTraderService extends ws_service_1.BaseWebsocketService {
             return resp.data.data;
         });
     }
+    /**
+     * DO NOT USE:
+     *
+     * Orders cancelling still needs workings on trader.
+     * Right now there's nothing preventing a double order cancel
+     */
     cancelOpenOrder(operationId) {
         return __awaiter(this, void 0, void 0, function* () {
             const resp = yield this.httpClient.delete(`trader/operation/open-order/${operationId}`);
@@ -111,6 +130,12 @@ class InstanceTraderService extends ws_service_1.BaseWebsocketService {
             return resp.data.data;
         });
     }
+    /**
+     * DO NOT USE:
+     *
+     * Orders cancelling still needs workings on trader.
+     * Right now there's nothing preventing a double order cancel
+     */
     cancelCloseOrder(operationId) {
         return __awaiter(this, void 0, void 0, function* () {
             const resp = yield this.httpClient.delete(`trader/operation/close-order/${operationId}`);
@@ -122,6 +147,15 @@ class InstanceTraderService extends ws_service_1.BaseWebsocketService {
             }
             return resp.data.data;
         });
+    }
+    liquidatedOpEventHandler(data) {
+        this.liquidatedOpsUpdates$.next(data);
+    }
+    rejectedOrdersEventHandler(data) {
+        this.rejectedOrdersUpdates$.next(data);
+    }
+    openedOpEventHandler(data) {
+        this.openedOpsUpdates$.next(data);
     }
     closedOpEventHandler(data) {
         this.closedOpsUpdates$.next(data);

@@ -185,26 +185,6 @@ export class IvySDK {
     return this.trader.getClosedOperation(operationId);
   }
 
-  enableClosedOperationsUpdates() {
-    if (this.trader === null) throw new Error(`Trader service disabled`);
-    return this.trader.enableClosedOperationsUpdates();
-  }
-
-  subscribeClosedOperationsUpdates() {
-    if (this.trader === null) throw new Error(`Trader service disabled`);
-    return this.trader.subscribeClosedOperationsUpdates();
-  }
-
-  enableActiveStatsUpdate() {
-    if (this.trader === null) throw new Error(`Trader service disabled`);
-    return this.trader.enableActiveStatsUpdates();
-  }
-
-  subscribeActiveStatsUpdates() {
-    if (this.trader === null) throw new Error(`Trader service disabled`);
-    return this.trader.subscribeActiveStatsUpdates();
-  }
-
   enableIKStream() {
     if (this.SSM === null) throw new Error(`SSM service disabled`);
     return this.SSM.enableIKStream();
@@ -213,11 +193,6 @@ export class IvySDK {
   disableIKStream() {
     if (this.SSM === null) throw new Error(`SSM service disabled`);
     return this.SSM.disableIKStream();
-  }
-
-  subscribeIKStream() {
-    if (this.SSM === null) throw new Error(`SSM service disabled`);
-    return this.SSM.subscribeIKStream();
   }
 
   enableFKStream() {
@@ -230,21 +205,12 @@ export class IvySDK {
     return this.SSM.disableFKStream();
   }
 
-  subscribeFKStream() {
-    if (this.SSM === null) throw new Error(`SSM service disabled`);
-    return this.SSM.subscribeFKStream();
-  }
-
   enablePumpStream(payload: { xm: ExchangesMarkets; tfs: string[] }) {
     return this.pumpdump.enablePumpStream(payload);
   }
 
   disablePumpStream(payload: { xm: ExchangesMarkets }) {
     return this.pumpdump.disablePumpStream(payload);
-  }
-
-  subscribePumpStream() {
-    return this.pumpdump.subscribePumpStream();
   }
 
   enableDumpStream(payload: { xm: ExchangesMarkets; tfs: string[] }) {
@@ -255,6 +221,74 @@ export class IvySDK {
     return this.pumpdump.disableDumpStream(payload);
   }
 
+  enableActiveStatsUpdate() {
+    if (this.trader === null) throw new Error(`Trader service disabled`);
+    return this.trader.enableActiveStatsUpdates();
+  }
+
+  subscribeActiveStatsUpdates() {
+    if (this.trader === null) throw new Error(`Trader service disabled`);
+    return this.trader.subscribeActiveStatsUpdates();
+  }
+
+  /**
+   * Always active stream
+   */
+  subscribeOpenedOperationsUpdates() {
+    if (this.trader === null) throw new Error(`Trader service disabled`);
+    return this.trader.subscribeOpenedOperationsUpdates();
+  }
+
+  /**
+   * Always active stream
+   */
+  subscribeClosedOperationsUpdates() {
+    if (this.trader === null) throw new Error(`Trader service disabled`);
+    return this.trader.subscribeClosedOperationsUpdates();
+  }
+
+  /**
+   * Always active stream
+   */
+  subscribeLiquidatedOperationsUpdates() {
+    if (this.trader === null) throw new Error(`Trader service disabled`);
+    return this.trader.subscribeLiquidatedOperationsUpdates();
+  }
+
+  /**
+   * Always active stream
+   */
+  subscribeRejectedOrdersUpdates() {
+    if (this.trader === null) throw new Error(`Trader service disabled`);
+    return this.trader.subscribeRejectedOrdersUpdates();
+  }
+
+  /**
+   * Stream active after activation request
+   */
+  subscribeIKStream() {
+    if (this.SSM === null) throw new Error(`SSM service disabled`);
+    return this.SSM.subscribeIKStream();
+  }
+
+  /**
+   * Stream active after activation request
+   */
+  subscribeFKStream() {
+    if (this.SSM === null) throw new Error(`SSM service disabled`);
+    return this.SSM.subscribeFKStream();
+  }
+
+  /**
+   * Stream active after activation request
+   */
+  subscribePumpStream() {
+    return this.pumpdump.subscribePumpStream();
+  }
+
+  /**
+   * Stream active after activation request
+   */
   subscribeDumpStream() {
     return this.pumpdump.subscribeDumpStream();
   }
