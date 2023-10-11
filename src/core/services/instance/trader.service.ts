@@ -26,6 +26,7 @@ export class InstanceTraderService extends BaseWebsocketService {
   private readonly closedOpsUpdates$ = new Subject<ITraderOperation>();
   private readonly liquidatedOpsUpdates$ = new Subject<ITraderOperation>();
   private readonly rejectedOrdersUpdates$ = new Subject<ITraderOperation>();
+  private readonly cancelledOrdersUpdates$ = new Subject<ITraderOperation>();
 
   private readonly activeStatsUpdates$ = new Subject<IActiveStatsUpdate>();
 
@@ -56,6 +57,10 @@ export class InstanceTraderService extends BaseWebsocketService {
           this.socket.on(
             'liquidation-event',
             this.liquidatedOpEventHandler.bind(this),
+          );
+          this.socket.on(
+            'cancelled-order-event',
+            this.cancelledOrdersEventHandler.bind(this),
           );
           this.socket.on(
             'rejected-order-event',
@@ -97,6 +102,10 @@ export class InstanceTraderService extends BaseWebsocketService {
 
   subscribeLiquidatedOperationsUpdates(): Observable<ITraderOperation> {
     return this.liquidatedOpsUpdates$.asObservable();
+  }
+
+  subscribeCancelledOrdersUpdates(): Observable<ITraderOperation> {
+    return this.cancelledOrdersUpdates$.asObservable();
   }
 
   subscribeRejectedOrdersUpdates(): Observable<ITraderOperation> {
@@ -169,12 +178,6 @@ export class InstanceTraderService extends BaseWebsocketService {
     return resp.data.data!;
   }
 
-  /**
-   * DO NOT USE:
-   *
-   * Orders cancelling still needs workings on trader.
-   * Right now there's nothing preventing a double order cancel
-   */
   async cancelOpenOrder(operationId: string): Promise<boolean> {
     const resp = await this.httpClient.delete<IBaseResponse<boolean>>(
       `trader/operation/open-order/${operationId}`,
@@ -190,12 +193,6 @@ export class InstanceTraderService extends BaseWebsocketService {
     return resp.data.data!;
   }
 
-  /**
-   * DO NOT USE:
-   *
-   * Orders cancelling still needs workings on trader.
-   * Right now there's nothing preventing a double order cancel
-   */
   async cancelCloseOrder(operationId: string): Promise<boolean> {
     const resp = await this.httpClient.delete<IBaseResponse<boolean>>(
       `trader/operation/close-order/${operationId}`,
@@ -213,6 +210,10 @@ export class InstanceTraderService extends BaseWebsocketService {
 
   private liquidatedOpEventHandler(data: ITraderOperation) {
     this.liquidatedOpsUpdates$.next(data);
+  }
+
+  private cancelledOrdersEventHandler(data: ITraderOperation) {
+    this.cancelledOrdersUpdates$.next(data);
   }
 
   private rejectedOrdersEventHandler(data: ITraderOperation) {

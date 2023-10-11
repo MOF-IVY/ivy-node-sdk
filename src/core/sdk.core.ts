@@ -171,6 +171,13 @@ export class IvySDK {
     return this.trader.closeOperation(opts);
   }
 
+  cancelOrder(operationId: string, orderType: 'open' | 'close') {
+    if (this.trader === null) throw new Error(`Trader service disabled`);
+    return orderType === 'open'
+      ? this.trader.cancelOpenOrder(operationId)
+      : this.trader.cancelCloseOrder(operationId);
+  }
+
   hasOperationOpen(
     xm: ExchangesMarkets,
     symbol: string,
@@ -221,6 +228,9 @@ export class IvySDK {
     return this.pumpdump.disableDumpStream(payload);
   }
 
+  /**
+   * Stream active after activation request
+   */
   enableActiveStatsUpdate() {
     if (this.trader === null) throw new Error(`Trader service disabled`);
     return this.trader.enableActiveStatsUpdates();
@@ -261,6 +271,14 @@ export class IvySDK {
   subscribeRejectedOrdersUpdates() {
     if (this.trader === null) throw new Error(`Trader service disabled`);
     return this.trader.subscribeRejectedOrdersUpdates();
+  }
+
+  /**
+   * Always active stream
+   */
+  subscribeCancelledOrdersUpdates() {
+    if (this.trader === null) throw new Error(`Trader service disabled`);
+    return this.trader.subscribeCancelledOrdersUpdates();
   }
 
   /**

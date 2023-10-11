@@ -16,6 +16,7 @@ export declare class InstanceTraderService extends BaseWebsocketService {
     private readonly closedOpsUpdates$;
     private readonly liquidatedOpsUpdates$;
     private readonly rejectedOrdersUpdates$;
+    private readonly cancelledOrdersUpdates$;
     private readonly activeStatsUpdates$;
     constructor(restAddress: string, wsAddress: string, apiKey: string);
     enableActiveStatsUpdates(): Promise<void | IStandardWsError>;
@@ -23,26 +24,16 @@ export declare class InstanceTraderService extends BaseWebsocketService {
     subscribeOpenedOperationsUpdates(): Observable<ITraderOperation>;
     subscribeClosedOperationsUpdates(): Observable<ITraderOperation>;
     subscribeLiquidatedOperationsUpdates(): Observable<ITraderOperation>;
+    subscribeCancelledOrdersUpdates(): Observable<ITraderOperation>;
     subscribeRejectedOrdersUpdates(): Observable<ITraderOperation>;
     hasOperationOpen(xm: ExchangesMarkets, symbol: string, type: ExchangeOperationType): Promise<boolean>;
     getClosedOperation(operationId: string): Promise<ITraderOperation>;
     createNewOperation(opts: ITraderOpenOrderOpts): Promise<string | null>;
     closeOperation(opts: ITraderCloseOrderOpts): Promise<string | null>;
-    /**
-     * DO NOT USE:
-     *
-     * Orders cancelling still needs workings on trader.
-     * Right now there's nothing preventing a double order cancel
-     */
     cancelOpenOrder(operationId: string): Promise<boolean>;
-    /**
-     * DO NOT USE:
-     *
-     * Orders cancelling still needs workings on trader.
-     * Right now there's nothing preventing a double order cancel
-     */
     cancelCloseOrder(operationId: string): Promise<boolean>;
     private liquidatedOpEventHandler;
+    private cancelledOrdersEventHandler;
     private rejectedOrdersEventHandler;
     private openedOpEventHandler;
     private closedOpEventHandler;

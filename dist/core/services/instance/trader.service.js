@@ -23,6 +23,7 @@ class InstanceTraderService extends ws_service_1.BaseWebsocketService {
         this.closedOpsUpdates$ = new rxjs_1.Subject();
         this.liquidatedOpsUpdates$ = new rxjs_1.Subject();
         this.rejectedOrdersUpdates$ = new rxjs_1.Subject();
+        this.cancelledOrdersUpdates$ = new rxjs_1.Subject();
         this.activeStatsUpdates$ = new rxjs_1.Subject();
         this.httpClient = axios_1.default.create({
             baseURL: restAddress,
@@ -37,6 +38,7 @@ class InstanceTraderService extends ws_service_1.BaseWebsocketService {
             this.socket.on('closed-operation-event', this.closedOpEventHandler.bind(this));
             this.socket.on('opened-operation-event', this.openedOpEventHandler.bind(this));
             this.socket.on('liquidation-event', this.liquidatedOpEventHandler.bind(this));
+            this.socket.on('cancelled-order-event', this.cancelledOrdersEventHandler.bind(this));
             this.socket.on('rejected-order-event', this.rejectedOrdersEventHandler.bind(this));
         }))
             .subscribe();
@@ -60,6 +62,9 @@ class InstanceTraderService extends ws_service_1.BaseWebsocketService {
     }
     subscribeLiquidatedOperationsUpdates() {
         return this.liquidatedOpsUpdates$.asObservable();
+    }
+    subscribeCancelledOrdersUpdates() {
+        return this.cancelledOrdersUpdates$.asObservable();
     }
     subscribeRejectedOrdersUpdates() {
         return this.rejectedOrdersUpdates$.asObservable();
@@ -112,12 +117,6 @@ class InstanceTraderService extends ws_service_1.BaseWebsocketService {
             return resp.data.data;
         });
     }
-    /**
-     * DO NOT USE:
-     *
-     * Orders cancelling still needs workings on trader.
-     * Right now there's nothing preventing a double order cancel
-     */
     cancelOpenOrder(operationId) {
         return __awaiter(this, void 0, void 0, function* () {
             const resp = yield this.httpClient.delete(`trader/operation/open-order/${operationId}`);
@@ -130,12 +129,6 @@ class InstanceTraderService extends ws_service_1.BaseWebsocketService {
             return resp.data.data;
         });
     }
-    /**
-     * DO NOT USE:
-     *
-     * Orders cancelling still needs workings on trader.
-     * Right now there's nothing preventing a double order cancel
-     */
     cancelCloseOrder(operationId) {
         return __awaiter(this, void 0, void 0, function* () {
             const resp = yield this.httpClient.delete(`trader/operation/close-order/${operationId}`);
@@ -150,6 +143,9 @@ class InstanceTraderService extends ws_service_1.BaseWebsocketService {
     }
     liquidatedOpEventHandler(data) {
         this.liquidatedOpsUpdates$.next(data);
+    }
+    cancelledOrdersEventHandler(data) {
+        this.cancelledOrdersUpdates$.next(data);
     }
     rejectedOrdersEventHandler(data) {
         this.rejectedOrdersUpdates$.next(data);

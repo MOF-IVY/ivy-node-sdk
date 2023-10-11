@@ -36,6 +36,7 @@ export declare class IvySDK {
     loadHistory(opts: IHistoryLoadRequestOpts): Promise<import("../main").IHistoryLoaded>;
     newOperation(opts: ITraderOpenOrderOpts): Promise<string | null>;
     closeOperation(opts: ITraderCloseOrderOpts): Promise<string | null>;
+    cancelOrder(operationId: string, orderType: 'open' | 'close'): Promise<boolean>;
     hasOperationOpen(xm: ExchangesMarkets, symbol: string, type: ExchangeOperationType): Promise<boolean>;
     getClosedOperation(operationId: string): Promise<import("../main").ITraderOperation<unknown>>;
     enableIKStream(): Promise<void | import("./services/base/ws.service").IStandardWsError>;
@@ -56,6 +57,9 @@ export declare class IvySDK {
     disableDumpStream(payload: {
         xm: ExchangesMarkets;
     }): Promise<void | import("./services/base/ws.service").IStandardWsError>;
+    /**
+     * Stream active after activation request
+     */
     enableActiveStatsUpdate(): Promise<void | import("./services/base/ws.service").IStandardWsError>;
     subscribeActiveStatsUpdates(): Observable<import("./services/instance/trader.service").IActiveStatsUpdate>;
     /**
@@ -74,6 +78,10 @@ export declare class IvySDK {
      * Always active stream
      */
     subscribeRejectedOrdersUpdates(): Observable<import("../main").ITraderOperation<unknown>>;
+    /**
+     * Always active stream
+     */
+    subscribeCancelledOrdersUpdates(): Observable<import("../main").ITraderOperation<unknown>>;
     /**
      * Stream active after activation request
      */
