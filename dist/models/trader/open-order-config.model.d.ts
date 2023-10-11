@@ -5,6 +5,10 @@ export interface ITraderOpenOrderOpts {
     orderType: 'Limit' | 'Market';
     operationType: ExchangeOperationType;
     /**
+     * Required if order type is Limit
+     */
+    limitPrice?: number;
+    /**
      * From exchange market, in case of bybit,
      * the category will be deduced from the
      * implicit exchange market name

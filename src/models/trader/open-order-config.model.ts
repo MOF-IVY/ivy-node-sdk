@@ -3,10 +3,13 @@ import { ExchangesMarkets } from '../common/exchanges-markets.type';
 
 export interface ITraderOpenOrderOpts {
   symbol: string;
-
   orderType: 'Limit' | 'Market';
-
   operationType: ExchangeOperationType;
+
+  /**
+   * Required if order type is Limit
+   */
+  limitPrice?: number;
 
   /**
    * From exchange market, in case of bybit,
