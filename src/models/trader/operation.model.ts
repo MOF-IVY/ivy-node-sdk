@@ -27,12 +27,19 @@ export interface ITraderOperation<OrderType = unknown> {
   openOrderPending: boolean;
   openOrderRejected: boolean;
   openOrderCancelled: boolean;
+  openOrderLiquidated: boolean;
 
   closeOrder: OrderType;
   closeOrderFilled: boolean;
   closeOrderPending: boolean;
   closeOrderRejected: boolean;
   closeOrderCancelled: boolean;
+
+  /**
+   * Is a percent value, not an
+   * actual ratio
+   */
+  feeRate: number;
 
   stats: IOperationStats;
 }
