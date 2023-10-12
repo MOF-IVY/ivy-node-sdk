@@ -14,25 +14,31 @@ export interface ISDKConfigOpts {
     instanceTraderRestApiAddress?: string | null;
     instanceLoggingCenterWsApiAddress?: string | null;
     instanceHistoryLoaderWsApiAddress?: string | null;
+    instanceControlCenterWsApiAddress?: string | null;
+    instanceControlCenterRestApiAddress?: string | null;
 }
-export declare class IvySDK {
+export declare class IvySDK<ScriptConfigType = Record<string, any>> {
     private readonly apiKey;
-    private readonly gatewayWSApiAddress;
-    private readonly gatewayRESTApiAddress;
-    private readonly instanceSSMWSApiAddress;
+    private readonly gatewayWsApiAddress;
+    private readonly gatewayRestApiAddress;
+    private readonly instanceSSMWsApiAddress;
     private readonly instanceTraderWsApiAddress;
+    private readonly instanceControlCenterWsApiAddress;
+    private readonly instanceControlCenterRestApiAddress;
     private readonly instanceTraderRestApiAddress;
-    private readonly instanceLoggingCenterWSApiAddress;
-    private readonly instanceHistoryLoaderWSApiAddress;
+    private readonly instanceLoggingCenterWsApiAddress;
+    private readonly instanceHistoryLoaderWsApiAddress;
     private readonly SSM;
     private readonly trader;
     private readonly pumpdump;
     private readonly loggingCenter;
     private readonly historyLoader;
+    private readonly controlCenter;
     constructor(opts?: ISDKConfigOpts);
     subscribeReady(): Observable<boolean>;
     clearLogs(keys: string[]): void;
     log(message: string | object, key: string, persist?: boolean): void;
+    getConfig(): Promise<ScriptConfigType>;
     loadHistory(opts: IHistoryLoadRequestOpts): Promise<import("../main").IHistoryLoaded>;
     newOperation(opts: ITraderOpenOrderOpts): Promise<string | null>;
     closeOperation(opts: ITraderCloseOrderOpts): Promise<string | null>;
@@ -57,11 +63,31 @@ export declare class IvySDK {
     disableDumpStream(payload: {
         xm: ExchangesMarkets;
     }): Promise<void | import("./services/base/ws.service").IStandardWsError>;
-    /**
-     * Stream active after activation request
-     */
     enableActiveStatsUpdate(): Promise<void | import("./services/base/ws.service").IStandardWsError>;
-    subscribeActiveStatsUpdates(): Observable<import("./services/instance/trader.service").IActiveStatsUpdate>;
+    /**
+     * Always active stream
+     *
+     * Once you've received this event, you have 10s
+     * to complete any cleanup operation, before the
+     * script gets killed.
+     */
+    subscribeRestartCommands(): Observable<void>;
+    /**
+     * Always active stream
+     *
+     * Once you've received this event, you must
+     * IMMEDIATELY stop opening orders. But you
+     * should continue tracking opened ones.
+     */
+    subscribePauseCommands(): Observable<void>;
+    /**
+     * Always active stream
+     *
+     * Once you've received this event, you can
+     * go back to opening orders as your script
+     * logic would normally do.
+     */
+    subscribeResumeCommands(): Observable<void>;
     /**
      * Always active stream
      */
@@ -82,6 +108,10 @@ export declare class IvySDK {
      * Always active stream
      */
     subscribeCancelledOrdersUpdates(): Observable<import("../main").ITraderOperation<unknown>>;
+    /**
+     * Stream active after activation request
+     */
+    subscribeActiveStatsUpdates(): Observable<import("./services/instance/trader.service").IActiveStatsUpdate>;
     /**
      * Stream active after activation request
      */

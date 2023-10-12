@@ -13,6 +13,7 @@ import { InstanceLoggingCenterService } from './services/instance/logging-center
 import { ITraderOpenOrderOpts } from '../models/trader/open-order-config.model';
 import { ITraderCloseOrderOpts } from '../models/trader/close-order-config.model';
 import { IHistoryLoadRequestOpts } from '../models/history-loader/history-load-request.model';
+import { InstanceControlCenterService } from './services/instance/control-center.service';
 
 export interface ISDKConfigOpts {
   apiKey?: string;
@@ -26,34 +27,39 @@ export interface ISDKConfigOpts {
   instanceTraderRestApiAddress?: string | null;
   instanceLoggingCenterWsApiAddress?: string | null;
   instanceHistoryLoaderWsApiAddress?: string | null;
+  instanceControlCenterWsApiAddress?: string | null;
+  instanceControlCenterRestApiAddress?: string | null;
 }
 
-export class IvySDK {
+export class IvySDK<ScriptConfigType = Record<string, any>> {
   private readonly apiKey: string;
-  private readonly gatewayWSApiAddress: string;
-  private readonly gatewayRESTApiAddress: string;
-  private readonly instanceSSMWSApiAddress: string | null;
+  private readonly gatewayWsApiAddress: string;
+  private readonly gatewayRestApiAddress: string;
+  private readonly instanceSSMWsApiAddress: string | null;
   private readonly instanceTraderWsApiAddress: string | null;
+  private readonly instanceControlCenterWsApiAddress: string;
+  private readonly instanceControlCenterRestApiAddress: string;
   private readonly instanceTraderRestApiAddress: string | null;
-  private readonly instanceLoggingCenterWSApiAddress: string | null;
-  private readonly instanceHistoryLoaderWSApiAddress: string | null;
+  private readonly instanceLoggingCenterWsApiAddress: string | null;
+  private readonly instanceHistoryLoaderWsApiAddress: string | null;
 
   private readonly SSM: InstanceSSMService | null;
   private readonly trader: InstanceTraderService | null;
   private readonly pumpdump: GatewayPumpDumpService;
   private readonly loggingCenter: InstanceLoggingCenterService | null;
   private readonly historyLoader: InstanceHistoryLoaderService | null;
+  private readonly controlCenter: InstanceControlCenterService<ScriptConfigType>;
 
   constructor(opts?: ISDKConfigOpts) {
     this.apiKey = opts?.apiKey ?? ENVConfig.scriptApiKey;
 
-    this.gatewayWSApiAddress =
+    this.gatewayWsApiAddress =
       opts?.gatewayWsApiAddress ?? 'ws://api.ivy.cryptobeam.net';
 
-    this.gatewayRESTApiAddress =
+    this.gatewayRestApiAddress =
       opts?.gatewayRestApiAddress ?? 'https://api.ivy.cryptobeam.net/api/v1/';
 
-    this.instanceSSMWSApiAddress =
+    this.instanceSSMWsApiAddress =
       opts?.instanceSSMWsApiAddress === null
         ? null
         : opts?.instanceSSMWsApiAddress ?? 'http://ivy-ssm:3000/ssm';
@@ -68,36 +74,52 @@ export class IvySDK {
         ? null
         : opts?.instanceTraderRestApiAddress ?? 'http://ivy-trader:3000';
 
-    this.instanceLoggingCenterWSApiAddress =
+    this.instanceLoggingCenterWsApiAddress =
       opts?.instanceLoggingCenterWsApiAddress === null
         ? null
         : opts?.instanceLoggingCenterWsApiAddress ??
           'ws://ivy-logging-center:3000/logging-center';
 
-    this.instanceHistoryLoaderWSApiAddress =
+    this.instanceControlCenterWsApiAddress =
+      opts?.instanceControlCenterWsApiAddress ??
+      'ws://ivy-control-center:3000/control-center';
+
+    this.instanceControlCenterRestApiAddress =
+      opts?.instanceTraderRestApiAddress ??
+      'http://ivy-control-center:3000/control-center';
+
+    this.instanceHistoryLoaderWsApiAddress =
       opts?.instanceHistoryLoaderWsApiAddress === null
         ? null
         : opts?.instanceHistoryLoaderWsApiAddress ??
           'ws://ivy-history-loader:3000/history-loader';
 
     console.log({
-      gatewayWSApiAddress: this.gatewayWSApiAddress,
-      gatewayRESTApiAddress: this.gatewayRESTApiAddress,
-      instanceSSMWSApiAddress: this.instanceSSMWSApiAddress,
+      instanceControlCenterRestApiAddress:
+        this.instanceControlCenterRestApiAddress,
+      gatewayWsApiAddress: this.gatewayWsApiAddress,
+      gatewayRestApiAddress: this.gatewayRestApiAddress,
+      instanceSSMWsApiAddress: this.instanceSSMWsApiAddress,
       instanceTraderWsApiAddress: this.instanceTraderWsApiAddress,
       instanceTraderRestApiAddress: this.instanceTraderRestApiAddress,
-      instanceLoggingCenterWSApiAddress: this.instanceLoggingCenterWSApiAddress,
-      instanceHistoryLoaderWSApiAddress: this.instanceHistoryLoaderWSApiAddress,
+      instanceLoggingCenterWsApiAddress: this.instanceLoggingCenterWsApiAddress,
+      instanceControlCenterWsApiAddress: this.instanceControlCenterWsApiAddress,
+      instanceHistoryLoaderWsApiAddress: this.instanceHistoryLoaderWsApiAddress,
     });
 
     this.ensureRequiredParametersOrThrow();
 
-    if (this.instanceSSMWSApiAddress)
-      this.SSM = new InstanceSSMService(this.instanceSSMWSApiAddress);
+    if (this.instanceSSMWsApiAddress)
+      this.SSM = new InstanceSSMService(this.instanceSSMWsApiAddress);
     else this.SSM = null;
 
     this.pumpdump = new GatewayPumpDumpService(
-      `${this.gatewayWSApiAddress}/pumpdump`,
+      `${this.gatewayWsApiAddress}/pumpdump`,
+    );
+
+    this.controlCenter = new InstanceControlCenterService<ScriptConfigType>(
+      this.instanceControlCenterRestApiAddress,
+      this.instanceControlCenterWsApiAddress,
     );
 
     if (this.instanceTraderRestApiAddress && this.instanceTraderWsApiAddress)
@@ -108,15 +130,15 @@ export class IvySDK {
       );
     else this.trader = null;
 
-    if (this.instanceLoggingCenterWSApiAddress)
+    if (this.instanceLoggingCenterWsApiAddress)
       this.loggingCenter = new InstanceLoggingCenterService(
-        this.instanceLoggingCenterWSApiAddress,
+        this.instanceLoggingCenterWsApiAddress,
       );
     else this.loggingCenter = null;
 
-    if (this.instanceHistoryLoaderWSApiAddress)
+    if (this.instanceHistoryLoaderWsApiAddress)
       this.historyLoader = new InstanceHistoryLoaderService(
-        this.instanceHistoryLoaderWSApiAddress,
+        this.instanceHistoryLoaderWsApiAddress,
       );
     else this.historyLoader = null;
   }
@@ -124,17 +146,18 @@ export class IvySDK {
   subscribeReady(): Observable<boolean> {
     return zip(
       this.pumpdump.subscribeReady(),
-      this.instanceSSMWSApiAddress !== null
+      this.controlCenter.subscribeReady(),
+      this.instanceSSMWsApiAddress !== null
         ? this.SSM!.subscribeReady()
         : of(true),
       this.instanceTraderWsApiAddress !== null &&
         this.instanceTraderRestApiAddress !== null
         ? this.trader!.subscribeReady()
         : of(true),
-      this.instanceHistoryLoaderWSApiAddress !== null
+      this.instanceHistoryLoaderWsApiAddress !== null
         ? this.historyLoader!.subscribeReady()
         : of(true),
-      this.instanceLoggingCenterWSApiAddress !== null
+      this.instanceLoggingCenterWsApiAddress !== null
         ? this.loggingCenter!.subscribeReady()
         : of(true),
     ).pipe(
@@ -153,6 +176,10 @@ export class IvySDK {
     if (this.loggingCenter === null)
       throw new Error(`Logging center service disabled`);
     return this.loggingCenter.postLog(message, key, persist);
+  }
+
+  getConfig(): Promise<ScriptConfigType> {
+    return this.controlCenter.getScriptConfig();
   }
 
   loadHistory(opts: IHistoryLoadRequestOpts) {
@@ -228,17 +255,42 @@ export class IvySDK {
     return this.pumpdump.disableDumpStream(payload);
   }
 
-  /**
-   * Stream active after activation request
-   */
   enableActiveStatsUpdate() {
     if (this.trader === null) throw new Error(`Trader service disabled`);
     return this.trader.enableActiveStatsUpdates();
   }
 
-  subscribeActiveStatsUpdates() {
-    if (this.trader === null) throw new Error(`Trader service disabled`);
-    return this.trader.subscribeActiveStatsUpdates();
+  /**
+   * Always active stream
+   *
+   * Once you've received this event, you have 10s
+   * to complete any cleanup operation, before the
+   * script gets killed.
+   */
+  subscribeRestartCommands() {
+    return this.controlCenter.subscribeRestartCommands();
+  }
+
+  /**
+   * Always active stream
+   *
+   * Once you've received this event, you must
+   * IMMEDIATELY stop opening orders. But you
+   * should continue tracking opened ones.
+   */
+  subscribePauseCommands() {
+    return this.controlCenter.subscribePauseCommands();
+  }
+
+  /**
+   * Always active stream
+   *
+   * Once you've received this event, you can
+   * go back to opening orders as your script
+   * logic would normally do.
+   */
+  subscribeResumeCommands() {
+    return this.controlCenter.subscribeResumeCommands();
   }
 
   /**
@@ -284,6 +336,14 @@ export class IvySDK {
   /**
    * Stream active after activation request
    */
+  subscribeActiveStatsUpdates() {
+    if (this.trader === null) throw new Error(`Trader service disabled`);
+    return this.trader.subscribeActiveStatsUpdates();
+  }
+
+  /**
+   * Stream active after activation request
+   */
   subscribeIKStream() {
     if (this.SSM === null) throw new Error(`SSM service disabled`);
     return this.SSM.subscribeIKStream();
@@ -317,17 +377,27 @@ export class IvySDK {
         "API key is missing. Either pass it via config or via environment at 'IVY_SCRIPT_API_KEY'",
       );
 
-    if (!this.gatewayWSApiAddress)
+    if (!this.gatewayWsApiAddress)
       throw new Error(
         'Gateway websocket address is missing. Do not specify it in the config to use the default one',
       );
 
-    if (!this.gatewayRESTApiAddress)
+    if (!this.gatewayRestApiAddress)
       throw new Error(
         'Gateway REST address is missing. Do not specify it in the config to use the default one',
       );
 
-    if (this.instanceSSMWSApiAddress !== null && !this.instanceSSMWSApiAddress)
+    if (!this.instanceControlCenterWsApiAddress)
+      throw new Error(
+        'Control center websocket address is missing. Do not specify it in the config to use the default one',
+      );
+
+    if (!this.instanceControlCenterRestApiAddress)
+      throw new Error(
+        'Control center REST address is missing. Do not specify it in the config to use the default one',
+      );
+
+    if (this.instanceSSMWsApiAddress !== null && !this.instanceSSMWsApiAddress)
       throw new Error(
         'SSM websocket address is missing. Do not specify it in the config to use the default one',
       );
@@ -349,16 +419,16 @@ export class IvySDK {
       );
 
     if (
-      this.instanceLoggingCenterWSApiAddress !== null &&
-      !this.instanceLoggingCenterWSApiAddress
+      this.instanceLoggingCenterWsApiAddress !== null &&
+      !this.instanceLoggingCenterWsApiAddress
     )
       throw new Error(
         'Logging center websocket address is missing. Do not specify it in the config to use the default one',
       );
 
     if (
-      this.instanceHistoryLoaderWSApiAddress !== null &&
-      !this.instanceHistoryLoaderWSApiAddress
+      this.instanceHistoryLoaderWsApiAddress !== null &&
+      !this.instanceHistoryLoaderWsApiAddress
     )
       throw new Error(
         'History loader websocket address is missing. Do not specify it in the config to use the default one',
