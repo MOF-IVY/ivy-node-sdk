@@ -19,20 +19,22 @@ export interface ITraderOpenOrderOpts {
   exchangeMarket: ExchangesMarkets;
 
   /**
-   * Required in case of spot buy orders
+   * The minimum buy budget to allocate for the operation.
+   * In order to prevent dust, we will tweak this amount
+   * until we get a qty that we're sure it will be sold without
+   * leaving any dust behind. This tweak is always negligible, and
+   * won't have any noticeable change on what you plan to use for
+   * the entry.
+   *
+   * That's why you might see a different entry budget on the
+   * final operation.
    */
-  minBuyBudget?: number;
+  minBuyBudget: number;
 
   /**
    * Required in case of linear orders
    */
   leverage?: number;
-
-  /**
-   * Required if exchange market is bybit_linear
-   * ((balance * leverage) * leverageEntryPercent) / 100
-   */
-  leverageEntryPercent?: number;
 
   isMockOrder?: boolean;
 }
