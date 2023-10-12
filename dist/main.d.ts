@@ -1,4 +1,5 @@
 export * from './core/sdk.core';
+export * from './utils/misc.utils';
 export * from './models/common/ohlcv.type';
 export * from './models/common/exchanges-markets.type';
 export * from './models/common/exchange-operation-type';

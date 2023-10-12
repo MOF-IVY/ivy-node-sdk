@@ -15,6 +15,7 @@ var __exportStar = (this && this.__exportStar) || function(m, exports) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 __exportStar(require("./core/sdk.core"), exports);
+__exportStar(require("./utils/misc.utils"), exports);
 __exportStar(require("./models/common/ohlcv.type"), exports);
 __exportStar(require("./models/common/exchanges-markets.type"), exports);
 __exportStar(require("./models/common/exchange-operation-type"), exports);
