@@ -5,7 +5,7 @@
   "main": "dist/main.js",
   "scripts": {
     "build": "tsc",
-    "pub": "npm run build && git add . && echo \"Commit message: \" && read message && git commit -m \"$message\" && git push origin main"
+    "pub": "npm run build && git add . && echo \"Commit message: \" && read message && git commit -m \"$message\" && git push"
   },
   "repository": {
     "type": "git",
