@@ -67,16 +67,20 @@ export declare class IvySDK<ScriptConfigType = Record<string, any>> {
     /**
      * Always active stream
      *
-     * Once you've received this event, you have 10s
-     * to complete any cleanup operation, before the
-     * script gets killed.
+     * Once you've received this event, you should reset your
+     * script state.
+     *
+     * Do not worry about closing operations or cancelling
+     * orders, since this has been already done by the trader
+     * and once you receive this event, is safe to forcefully
+     * reset the state to its initial value
      */
     subscribeRestartCommands(): Observable<void>;
     /**
      * Always active stream
      *
      * Once you've received this event, you must
-     * IMMEDIATELY stop opening orders. But you
+     * immediately stop opening orders. But you
      * should continue tracking opened ones.
      */
     subscribePauseCommands(): Observable<void>;
@@ -92,6 +96,14 @@ export declare class IvySDK<ScriptConfigType = Record<string, any>> {
      * Always active stream
      */
     subscribeOpenedOperationsUpdates(): Observable<import("../main").ITraderOperation<unknown>>;
+    /**
+     * Always active stream
+     */
+    subscribeOperationsOpenErrors(): Observable<import("../main").ITraderOperation<unknown>>;
+    /**
+     * Always active stream
+     */
+    subscribeOperationsCloseErrors(): Observable<import("../main").ITraderOperation<unknown>>;
     /**
      * Always active stream
      */

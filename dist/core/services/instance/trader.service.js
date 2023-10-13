@@ -22,6 +22,8 @@ class InstanceTraderService extends ws_service_1.BaseWebsocketService {
         this.openedOpsUpdates$ = new rxjs_1.Subject();
         this.closedOpsUpdates$ = new rxjs_1.Subject();
         this.liquidatedOpsUpdates$ = new rxjs_1.Subject();
+        this.operationsOpenErrors$ = new rxjs_1.Subject();
+        this.operationsCloseErrors$ = new rxjs_1.Subject();
         this.rejectedOrdersUpdates$ = new rxjs_1.Subject();
         this.cancelledOrdersUpdates$ = new rxjs_1.Subject();
         this.activeStatsUpdates$ = new rxjs_1.Subject();
@@ -40,6 +42,8 @@ class InstanceTraderService extends ws_service_1.BaseWebsocketService {
             this.socket.on('liquidation-event', this.liquidatedOpEventHandler.bind(this));
             this.socket.on('cancelled-order-event', this.cancelledOrdersEventHandler.bind(this));
             this.socket.on('rejected-order-event', this.rejectedOrdersEventHandler.bind(this));
+            this.socket.on('operation-open-error-event', this.operationOpenErrorEventHandler.bind(this));
+            this.socket.on('operation-close-error-event', this.operationCloseErrorEventHandler.bind(this));
         }))
             .subscribe();
     }
@@ -68,6 +72,12 @@ class InstanceTraderService extends ws_service_1.BaseWebsocketService {
     }
     subscribeRejectedOrdersUpdates() {
         return this.rejectedOrdersUpdates$.asObservable();
+    }
+    subscribeOperationsOpenErrors() {
+        return this.operationsOpenErrors$.asObservable();
+    }
+    subscribeOperationsCloseErrors() {
+        return this.operationsCloseErrors$.asObservable();
     }
     hasOperationOpen(xm, symbol, type) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -155,6 +165,12 @@ class InstanceTraderService extends ws_service_1.BaseWebsocketService {
     }
     closedOpEventHandler(data) {
         this.closedOpsUpdates$.next(data);
+    }
+    operationOpenErrorEventHandler(data) {
+        this.operationsOpenErrors$.next(data);
+    }
+    operationCloseErrorEventHandler(data) {
+        this.operationsCloseErrors$.next(data);
     }
     activeStatsEventHandler(data) {
         this.activeStatsUpdates$.next(data);

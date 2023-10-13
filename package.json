@@ -4,8 +4,8 @@
   "description": "Official IVY node sdk",
   "main": "dist/main.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "tsc"
+    "build": "tsc",
+    "pub": "npm run build && git add . && git commit -m echo $1 && git push origin main"
   },
   "repository": {
     "type": "git",
