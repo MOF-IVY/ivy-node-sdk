@@ -85,7 +85,6 @@ class InstanceControlCenterService extends ws_service_1.BaseWebsocketService {
         this.resumeCommands$.next();
     }
     configChangeEventHandler(data) {
-        console.log(`Config change: ${data}`);
         this.scriptConfigs$.next(data);
     }
 }
