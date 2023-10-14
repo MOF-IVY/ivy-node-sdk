@@ -85,7 +85,7 @@ export class IvySDK<ScriptConfigType = Record<string, any>> {
       'ws://ivy-control-center:3000/control-center';
 
     this.instanceControlCenterRestApiAddress =
-      opts?.instanceTraderRestApiAddress ??
+      opts?.instanceControlCenterRestApiAddress ??
       'http://ivy-control-center:3000/control-center';
 
     this.instanceHistoryLoaderWsApiAddress =

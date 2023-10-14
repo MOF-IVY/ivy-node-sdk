@@ -36,7 +36,7 @@ class IvySDK {
         this.instanceControlCenterWsApiAddress =
             (_h = opts === null || opts === void 0 ? void 0 : opts.instanceControlCenterWsApiAddress) !== null && _h !== void 0 ? _h : 'ws://ivy-control-center:3000/control-center';
         this.instanceControlCenterRestApiAddress =
-            (_j = opts === null || opts === void 0 ? void 0 : opts.instanceTraderRestApiAddress) !== null && _j !== void 0 ? _j : 'http://ivy-control-center:3000/control-center';
+            (_j = opts === null || opts === void 0 ? void 0 : opts.instanceControlCenterRestApiAddress) !== null && _j !== void 0 ? _j : 'http://ivy-control-center:3000/control-center';
         this.instanceHistoryLoaderWsApiAddress =
             (opts === null || opts === void 0 ? void 0 : opts.instanceHistoryLoaderWsApiAddress) === null
                 ? null
