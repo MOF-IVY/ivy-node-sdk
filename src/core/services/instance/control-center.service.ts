@@ -23,7 +23,7 @@ export class InstanceControlCenterService<
   private readonly restartCommands$ = new Subject<void>();
 
   constructor(restAddress: string, wsAddress: string) {
-    super(wsAddress);
+    super(wsAddress, { isScript: 'true' });
     this.httpClient = axios.create({
       baseURL: restAddress,
       headers: {

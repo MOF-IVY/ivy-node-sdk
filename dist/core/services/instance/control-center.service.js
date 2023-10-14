@@ -18,7 +18,7 @@ const rxjs_1 = require("rxjs");
 const ws_service_1 = require("../base/ws.service");
 class InstanceControlCenterService extends ws_service_1.BaseWebsocketService {
     constructor(restAddress, wsAddress) {
-        super(wsAddress);
+        super(wsAddress, { isScript: 'true' });
         this.pauseCommands$ = new rxjs_1.Subject();
         this.resumeCommands$ = new rxjs_1.Subject();
         this.restartCommands$ = new rxjs_1.Subject();

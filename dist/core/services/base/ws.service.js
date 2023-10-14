@@ -5,11 +5,14 @@ const rxjs_1 = require("rxjs");
 const socket_io_client_1 = require("socket.io-client");
 const config_core_1 = require("../../config/config/config.core");
 class BaseWebsocketService {
-    constructor(address) {
+    constructor(address, query) {
         this.ready$ = new rxjs_1.BehaviorSubject(false);
         this.eventsToEmitOnReconnect = [];
         this.emissionsQueue = [];
-        this.socket = (0, socket_io_client_1.io)(address, { auth: { apiKey: config_core_1.ENVConfig.scriptApiKey } });
+        this.socket = (0, socket_io_client_1.io)(address, {
+            query,
+            auth: { apiKey: config_core_1.ENVConfig.scriptApiKey },
+        });
         this.socket.on('welcome', () => {
             if (config_core_1.ENVConfig.verboseMode)
                 console.log(`[${address}] welcome received`);

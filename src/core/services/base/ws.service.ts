@@ -13,8 +13,11 @@ export abstract class BaseWebsocketService {
   private eventsToEmitOnReconnect: { event: string; payload?: unknown }[] = [];
   private emissionsQueue: [string, object | number | string | undefined][] = [];
 
-  constructor(address: string) {
-    this.socket = io(address, { auth: { apiKey: ENVConfig.scriptApiKey } });
+  constructor(address: string, query?: Record<string, string>) {
+    this.socket = io(address, {
+      query,
+      auth: { apiKey: ENVConfig.scriptApiKey },
+    });
     this.socket.on('welcome', () => {
       if (ENVConfig.verboseMode) console.log(`[${address}] welcome received`);
       this.ready$.next(true);

@@ -8,7 +8,7 @@ export declare abstract class BaseWebsocketService {
     private readonly ready$;
     private eventsToEmitOnReconnect;
     private emissionsQueue;
-    constructor(address: string);
+    constructor(address: string, query?: Record<string, string>);
     subscribeReady(): Observable<boolean>;
     protected safeEmit(eventName: string, payload?: object | number | string): void;
     protected safeEmitWithReconnect(eventName: string, payload?: object | number | string): void;
