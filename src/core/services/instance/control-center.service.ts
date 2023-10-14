@@ -113,6 +113,7 @@ export class InstanceControlCenterService<
   }
 
   private configChangeEventHandler(data: ScriptConfigType) {
+    console.log(`Config change: ${data}`);
     this.scriptConfigs$.next(data);
   }
 }
