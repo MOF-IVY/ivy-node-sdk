@@ -62,7 +62,7 @@ export class InstanceControlCenterService<
 
   async getScriptConfig(): Promise<ScriptConfigType> {
     const resp = await this.httpClient.get<IBaseResponse<ScriptConfigType>>(
-      `config/script`,
+      `control-center/config/script`,
     );
     if (resp.status < 300 && resp.data.statusCode >= 300) {
       throw new Error(`[${resp.data.statusCode}] ${resp.data.message}`);
@@ -77,7 +77,7 @@ export class InstanceControlCenterService<
 
   async initScriptConfig(config: ScriptConfigType): Promise<ScriptConfigType> {
     const resp = await this.httpClient.post<IBaseResponse<ScriptConfigType>>(
-      `config/script`,
+      `control-center/config/script`,
       config,
     );
     if (resp.status < 300 && resp.data.statusCode >= 300) {

@@ -48,7 +48,7 @@ class InstanceControlCenterService extends ws_service_1.BaseWebsocketService {
     }
     getScriptConfig() {
         return __awaiter(this, void 0, void 0, function* () {
-            const resp = yield this.httpClient.get(`config/script`);
+            const resp = yield this.httpClient.get(`control-center/config/script`);
             if (resp.status < 300 && resp.data.statusCode >= 300) {
                 throw new Error(`[${resp.data.statusCode}] ${resp.data.message}`);
             }
@@ -60,7 +60,7 @@ class InstanceControlCenterService extends ws_service_1.BaseWebsocketService {
     }
     initScriptConfig(config) {
         return __awaiter(this, void 0, void 0, function* () {
-            const resp = yield this.httpClient.post(`config/script`, config);
+            const resp = yield this.httpClient.post(`control-center/config/script`, config);
             if (resp.status < 300 && resp.data.statusCode >= 300) {
                 throw new Error(`[${resp.data.statusCode}] ${resp.data.message}`);
             }
