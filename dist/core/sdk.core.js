@@ -87,7 +87,7 @@ class IvySDK {
             !!SSM &&
             !!trader &&
             !!historyLoader &&
-            !!loggingCenter), (0, rxjs_1.tap)(() => console.log('SDK ready')), (0, rxjs_1.map)(() => true));
+            !!loggingCenter), (0, rxjs_1.take)(1), (0, rxjs_1.tap)(() => console.log('SDK ready')), (0, rxjs_1.map)(() => true));
     }
     clearLogs(keys) {
         throw new Error('Not implemented');

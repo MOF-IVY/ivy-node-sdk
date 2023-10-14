@@ -1,4 +1,4 @@
-import { Observable, filter, map, of, tap, zip } from 'rxjs';
+import { Observable, filter, map, of, take, tap, zip } from 'rxjs';
 import { ENVConfig } from './config/config/config.core';
 
 import { ExchangesMarkets } from '../models/common/exchanges-markets.type';
@@ -177,6 +177,7 @@ export class IvySDK<ScriptConfigType = Record<string, any>> {
           !!historyLoader &&
           !!loggingCenter,
       ),
+      take(1),
       tap(() => console.log('SDK ready')),
       map(() => true),
     );
