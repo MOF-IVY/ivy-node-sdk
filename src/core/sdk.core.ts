@@ -1,4 +1,4 @@
-import { Observable, filter, map, of, zip } from 'rxjs';
+import { Observable, filter, map, of, tap, zip } from 'rxjs';
 import { ENVConfig } from './config/config/config.core';
 
 import { ExchangesMarkets } from '../models/common/exchanges-markets.type';
@@ -162,8 +162,22 @@ export class IvySDK<ScriptConfigType = Record<string, any>> {
         : of(true),
     ).pipe(
       filter(
-        ([ssm, trd, pd, hl, lc]) => !!ssm && !!trd && !!pd && !!hl && !!lc,
+        ([
+          pumpdump,
+          controlCenter,
+          SSM,
+          trader,
+          historyLoader,
+          loggingCenter,
+        ]) =>
+          !!pumpdump &&
+          !!controlCenter &&
+          !!SSM &&
+          !!trader &&
+          !!historyLoader &&
+          !!loggingCenter,
       ),
+      tap(() => console.log('SDK ready')),
       map(() => true),
     );
   }
@@ -299,6 +313,14 @@ export class IvySDK<ScriptConfigType = Record<string, any>> {
    */
   subscribeResumeCommands() {
     return this.controlCenter.subscribeResumeCommands();
+  }
+
+  /**
+   * Always active stream
+   */
+  subscribeScriptConfigChanges() {
+    if (this.trader === null) throw new Error(`Trader service disabled`);
+    return this.controlCenter.subscribeScriptConfigChanges();
   }
 
   /**

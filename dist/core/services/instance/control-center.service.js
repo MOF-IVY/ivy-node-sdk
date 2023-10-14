@@ -22,6 +22,7 @@ class InstanceControlCenterService extends ws_service_1.BaseWebsocketService {
         this.pauseCommands$ = new rxjs_1.Subject();
         this.resumeCommands$ = new rxjs_1.Subject();
         this.restartCommands$ = new rxjs_1.Subject();
+        this.scriptConfigs$ = new rxjs_1.Subject();
         this.httpClient = axios_1.default.create({
             baseURL: restAddress,
             headers: {
@@ -34,8 +35,12 @@ class InstanceControlCenterService extends ws_service_1.BaseWebsocketService {
             this.socket.on('restart-event', this.restartCmdEventHandler.bind(this));
             this.socket.on('pause-event', this.pauseCmdEventHandler.bind(this));
             this.socket.on('resume-event', this.resumeCmdEventHandler.bind(this));
+            this.socket.on('config-change-event', this.configChangeEventHandler.bind(this));
         }))
             .subscribe();
+    }
+    subscribeScriptConfigChanges() {
+        return this.scriptConfigs$.asObservable();
     }
     subscribePauseCommands() {
         return this.pauseCommands$.asObservable();
@@ -78,6 +83,9 @@ class InstanceControlCenterService extends ws_service_1.BaseWebsocketService {
     }
     resumeCmdEventHandler() {
         this.resumeCommands$.next();
+    }
+    configChangeEventHandler(data) {
+        this.scriptConfigs$.next(data);
     }
 }
 exports.InstanceControlCenterService = InstanceControlCenterService;

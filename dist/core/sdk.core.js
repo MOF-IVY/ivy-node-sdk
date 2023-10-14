@@ -82,7 +82,12 @@ class IvySDK {
             ? this.historyLoader.subscribeReady()
             : (0, rxjs_1.of)(true), this.instanceLoggingCenterWsApiAddress !== null
             ? this.loggingCenter.subscribeReady()
-            : (0, rxjs_1.of)(true)).pipe((0, rxjs_1.filter)(([ssm, trd, pd, hl, lc]) => !!ssm && !!trd && !!pd && !!hl && !!lc), (0, rxjs_1.map)(() => true));
+            : (0, rxjs_1.of)(true)).pipe((0, rxjs_1.filter)(([pumpdump, controlCenter, SSM, trader, historyLoader, loggingCenter,]) => !!pumpdump &&
+            !!controlCenter &&
+            !!SSM &&
+            !!trader &&
+            !!historyLoader &&
+            !!loggingCenter), (0, rxjs_1.tap)(() => console.log('SDK ready')), (0, rxjs_1.map)(() => true));
     }
     clearLogs(keys) {
         throw new Error('Not implemented');
@@ -200,6 +205,14 @@ class IvySDK {
      */
     subscribeResumeCommands() {
         return this.controlCenter.subscribeResumeCommands();
+    }
+    /**
+     * Always active stream
+     */
+    subscribeScriptConfigChanges() {
+        if (this.trader === null)
+            throw new Error(`Trader service disabled`);
+        return this.controlCenter.subscribeScriptConfigChanges();
     }
     /**
      * Always active stream

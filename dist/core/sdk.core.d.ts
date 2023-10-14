@@ -96,6 +96,10 @@ export declare class IvySDK<ScriptConfigType = Record<string, any>> {
     /**
      * Always active stream
      */
+    subscribeScriptConfigChanges(): Observable<ScriptConfigType>;
+    /**
+     * Always active stream
+     */
     subscribeOpenedOperationsUpdates(): Observable<import("../main").ITraderOperation<unknown>>;
     /**
      * Always active stream

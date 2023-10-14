@@ -21,6 +21,7 @@ export class InstanceControlCenterService<
   private readonly pauseCommands$ = new Subject<void>();
   private readonly resumeCommands$ = new Subject<void>();
   private readonly restartCommands$ = new Subject<void>();
+  private readonly scriptConfigs$ = new Subject<ScriptConfigType>();
 
   constructor(restAddress: string, wsAddress: string) {
     super(wsAddress, { isScript: 'true' });
@@ -43,9 +44,17 @@ export class InstanceControlCenterService<
           );
           this.socket.on('pause-event', this.pauseCmdEventHandler.bind(this));
           this.socket.on('resume-event', this.resumeCmdEventHandler.bind(this));
+          this.socket.on(
+            'config-change-event',
+            this.configChangeEventHandler.bind(this),
+          );
         }),
       )
       .subscribe();
+  }
+
+  subscribeScriptConfigChanges(): Observable<ScriptConfigType> {
+    return this.scriptConfigs$.asObservable();
   }
 
   subscribePauseCommands(): Observable<void> {
@@ -101,5 +110,9 @@ export class InstanceControlCenterService<
 
   private resumeCmdEventHandler() {
     this.resumeCommands$.next();
+  }
+
+  private configChangeEventHandler(data: ScriptConfigType) {
+    this.scriptConfigs$.next(data);
   }
 }

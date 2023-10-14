@@ -12,7 +12,9 @@ export declare class InstanceControlCenterService<ScriptConfigType = Record<stri
     private readonly pauseCommands$;
     private readonly resumeCommands$;
     private readonly restartCommands$;
+    private readonly scriptConfigs$;
     constructor(restAddress: string, wsAddress: string);
+    subscribeScriptConfigChanges(): Observable<ScriptConfigType>;
     subscribePauseCommands(): Observable<void>;
     subscribeResumeCommands(): Observable<void>;
     subscribeRestartCommands(): Observable<void>;
@@ -21,4 +23,5 @@ export declare class InstanceControlCenterService<ScriptConfigType = Record<stri
     private restartCmdEventHandler;
     private pauseCmdEventHandler;
     private resumeCmdEventHandler;
+    private configChangeEventHandler;
 }
