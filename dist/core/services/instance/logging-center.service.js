@@ -14,6 +14,7 @@ class InstanceLoggingCenterService extends ws_service_1.BaseWebsocketService {
             : new log_model_1.IvyLog(message, key);
         this.socket.once('post-log-error', (error) => console.error(`Error posting log: ${error.error}`));
         this.socket.emit('post-log', logObject.toJSON());
+        console.log(`${new Date(logObject.time).toLocaleString()} (${key}) ${message}`);
     }
 }
 exports.InstanceLoggingCenterService = InstanceLoggingCenterService;
