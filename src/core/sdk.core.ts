@@ -177,8 +177,6 @@ export class IvySDK<ScriptConfigType = Record<string, any>> {
           !!historyLoader &&
           !!loggingCenter,
       ),
-      take(1),
-      tap(() => console.log('SDK ready')),
       map(() => true),
     );
   }
