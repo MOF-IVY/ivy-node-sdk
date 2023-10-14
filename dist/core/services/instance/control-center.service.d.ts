@@ -17,6 +17,7 @@ export declare class InstanceControlCenterService<ScriptConfigType = Record<stri
     subscribeResumeCommands(): Observable<void>;
     subscribeRestartCommands(): Observable<void>;
     getScriptConfig(): Promise<ScriptConfigType>;
+    initScriptConfig(config: ScriptConfigType): Promise<ScriptConfigType>;
     private restartCmdEventHandler;
     private pauseCmdEventHandler;
     private resumeCmdEventHandler;

@@ -58,6 +58,18 @@ class InstanceControlCenterService extends ws_service_1.BaseWebsocketService {
             return resp.data.data;
         });
     }
+    initScriptConfig(config) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const resp = yield this.httpClient.post(`config/script`, config);
+            if (resp.status < 300 && resp.data.statusCode >= 300) {
+                throw new Error(`[${resp.data.statusCode}] ${resp.data.message}`);
+            }
+            if (resp.status >= 300) {
+                throw new Error(`[${InstanceControlCenterService.name}] http error while trying to set script config: ${resp.statusText}`);
+            }
+            return resp.data.data;
+        });
+    }
     restartCmdEventHandler() {
         this.restartCommands$.next();
     }

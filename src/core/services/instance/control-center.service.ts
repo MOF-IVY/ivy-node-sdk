@@ -75,6 +75,22 @@ export class InstanceControlCenterService<
     return resp.data.data!;
   }
 
+  async initScriptConfig(config: ScriptConfigType): Promise<ScriptConfigType> {
+    const resp = await this.httpClient.post<IBaseResponse<ScriptConfigType>>(
+      `config/script`,
+      config,
+    );
+    if (resp.status < 300 && resp.data.statusCode >= 300) {
+      throw new Error(`[${resp.data.statusCode}] ${resp.data.message}`);
+    }
+    if (resp.status >= 300) {
+      throw new Error(
+        `[${InstanceControlCenterService.name}] http error while trying to set script config: ${resp.statusText}`,
+      );
+    }
+    return resp.data.data!;
+  }
+
   private restartCmdEventHandler() {
     this.restartCommands$.next();
   }

@@ -92,6 +92,9 @@ class IvySDK {
             throw new Error(`Logging center service disabled`);
         return this.loggingCenter.postLog(message, key, persist);
     }
+    initConfig(config) {
+        return this.controlCenter.initScriptConfig(config);
+    }
     getConfig() {
         return this.controlCenter.getScriptConfig();
     }

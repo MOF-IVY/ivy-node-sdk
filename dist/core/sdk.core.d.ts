@@ -38,6 +38,7 @@ export declare class IvySDK<ScriptConfigType = Record<string, any>> {
     subscribeReady(): Observable<boolean>;
     clearLogs(keys: string[]): void;
     log(message: string | object, key: string, persist?: boolean): void;
+    initConfig(config: ScriptConfigType): Promise<ScriptConfigType>;
     getConfig(): Promise<ScriptConfigType>;
     loadHistory(opts: IHistoryLoadRequestOpts): Promise<import("../main").IHistoryLoaded>;
     newOperation(opts: ITraderOpenOrderOpts): Promise<string | null>;

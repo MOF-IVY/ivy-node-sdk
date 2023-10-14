@@ -178,6 +178,10 @@ export class IvySDK<ScriptConfigType = Record<string, any>> {
     return this.loggingCenter.postLog(message, key, persist);
   }
 
+  initConfig(config: ScriptConfigType): Promise<ScriptConfigType> {
+    return this.controlCenter.initScriptConfig(config);
+  }
+
   getConfig(): Promise<ScriptConfigType> {
     return this.controlCenter.getScriptConfig();
   }
