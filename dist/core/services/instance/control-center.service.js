@@ -72,7 +72,10 @@ class InstanceControlCenterService extends ws_service_1.BaseWebsocketService {
             if (resp.status >= 300) {
                 throw new Error(`[${InstanceControlCenterService.name}] http error while trying to set script config: ${resp.statusText}`);
             }
-            return resp.data.data;
+            if (!resp.data.data) {
+                throw new Error(`Request succeeded but server returned error`);
+            }
+            return config;
         });
     }
     restartCmdEventHandler() {

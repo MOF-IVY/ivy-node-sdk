@@ -97,7 +97,11 @@ export class InstanceControlCenterService<
         `[${InstanceControlCenterService.name}] http error while trying to set script config: ${resp.statusText}`,
       );
     }
-    return resp.data.data!;
+    if (!resp.data.data) {
+      throw new Error(`Request succeeded but server returned error`);
+    }
+
+    return config;
   }
 
   private restartCmdEventHandler() {
