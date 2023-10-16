@@ -92,10 +92,10 @@ class IvySDK {
     clearLogs(keys) {
         throw new Error('Not implemented');
     }
-    log(message, key, persist = false) {
+    log(message, key, persist = false, logToConsole = true) {
         if (this.loggingCenter === null)
             throw new Error(`Logging center service disabled`);
-        return this.loggingCenter.postLog(message, key, persist);
+        return this.loggingCenter.postLog(message, key, persist, logToConsole);
     }
     initConfig(config) {
         return this.controlCenter.initScriptConfig(config);

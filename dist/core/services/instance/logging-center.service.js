@@ -8,13 +8,14 @@ class InstanceLoggingCenterService extends ws_service_1.BaseWebsocketService {
     constructor(address) {
         super(address);
     }
-    postLog(message, key, persist) {
+    postLog(message, key, persist, logToConsole) {
         const logObject = persist
             ? new stored_log_model_1.IvyStoredLog(message, key)
             : new log_model_1.IvyLog(message, key);
         this.socket.once('post-log-error', (error) => console.error(`Error posting log: ${error.error}`));
         this.socket.emit('post-log', logObject.toJSON());
-        console.log(`${new Date(logObject.time).toLocaleString()} (${key}) ${message}`);
+        if (logToConsole)
+            console.log(`${new Date(logObject.time).toLocaleString()} (${key}) ${message}`);
     }
 }
 exports.InstanceLoggingCenterService = InstanceLoggingCenterService;

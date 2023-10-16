@@ -185,10 +185,15 @@ export class IvySDK<ScriptConfigType = Record<string, any>> {
     throw new Error('Not implemented');
   }
 
-  log(message: string | object, key: string, persist = false) {
+  log(
+    message: string | object,
+    key: string,
+    persist = false,
+    logToConsole = true,
+  ) {
     if (this.loggingCenter === null)
       throw new Error(`Logging center service disabled`);
-    return this.loggingCenter.postLog(message, key, persist);
+    return this.loggingCenter.postLog(message, key, persist, logToConsole);
   }
 
   initConfig(config: ScriptConfigType): Promise<ScriptConfigType> {

@@ -8,7 +8,12 @@ export class InstanceLoggingCenterService extends BaseWebsocketService {
     super(address);
   }
 
-  postLog(message: string | object, key: string, persist: boolean) {
+  postLog(
+    message: string | object,
+    key: string,
+    persist: boolean,
+    logToConsole: boolean,
+  ) {
     const logObject = persist
       ? new IvyStoredLog(message, key)
       : new IvyLog(message, key);
@@ -17,8 +22,10 @@ export class InstanceLoggingCenterService extends BaseWebsocketService {
       console.error(`Error posting log: ${error.error}`),
     );
     this.socket.emit('post-log', logObject.toJSON());
-    console.log(
-      `${new Date(logObject.time).toLocaleString()} (${key}) ${message}`,
-    );
+
+    if (logToConsole)
+      console.log(
+        `${new Date(logObject.time).toLocaleString()} (${key}) ${message}`,
+      );
   }
 }
