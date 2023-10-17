@@ -49,10 +49,10 @@ class InstanceTraderService extends ws_service_1.BaseWebsocketService {
     }
     enableActiveStatsUpdates() {
         return new Promise((resolve) => {
-            this.socket.on('active-stats-event', this.activeStatsEventHandler.bind(this));
-            this.socket.once('subscribe-active-stats-update-error', (error) => resolve(error));
-            this.socket.once('subscribe-active-stats-update-success', () => resolve());
-            this.safeEmitWithReconnect('subscribe-active-stats-update');
+            this.socket.on('active-operation-stats-event', this.activeStatsEventHandler.bind(this));
+            this.socket.once('subscribe-active-operation-stats-update-error', (error) => resolve(error));
+            this.socket.once('subscribe-active-operation-stats-update-success', () => resolve());
+            this.safeEmitWithReconnect('subscribe-active-operation-stats-update');
         });
     }
     subscribeActiveStatsUpdates() {

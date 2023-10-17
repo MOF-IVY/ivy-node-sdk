@@ -84,17 +84,17 @@ export class InstanceTraderService extends BaseWebsocketService {
   enableActiveStatsUpdates(): Promise<void | IStandardWsError> {
     return new Promise((resolve) => {
       this.socket.on(
-        'active-stats-event',
+        'active-operation-stats-event',
         this.activeStatsEventHandler.bind(this),
       );
       this.socket.once(
-        'subscribe-active-stats-update-error',
+        'subscribe-active-operation-stats-update-error',
         (error: IStandardWsError) => resolve(error),
       );
-      this.socket.once('subscribe-active-stats-update-success', () =>
+      this.socket.once('subscribe-active-operation-stats-update-success', () =>
         resolve(),
       );
-      this.safeEmitWithReconnect('subscribe-active-stats-update');
+      this.safeEmitWithReconnect('subscribe-active-operation-stats-update');
     });
   }
 
