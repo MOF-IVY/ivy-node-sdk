@@ -14,16 +14,16 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.InstanceTraderService = void 0;
 const axios_1 = __importDefault(require("axios"));
-const ws_service_1 = require("../base/ws.service");
 const rxjs_1 = require("rxjs");
+const ws_service_1 = require("../base/ws.service");
 class InstanceTraderService extends ws_service_1.BaseWebsocketService {
     constructor(restAddress, wsAddress, apiKey) {
         super(wsAddress);
+        this.operationsOpenErrors$ = new rxjs_1.Subject();
+        this.operationsCloseErrors$ = new rxjs_1.Subject();
         this.openedOpsUpdates$ = new rxjs_1.Subject();
         this.closedOpsUpdates$ = new rxjs_1.Subject();
         this.liquidatedOpsUpdates$ = new rxjs_1.Subject();
-        this.operationsOpenErrors$ = new rxjs_1.Subject();
-        this.operationsCloseErrors$ = new rxjs_1.Subject();
         this.rejectedOrdersUpdates$ = new rxjs_1.Subject();
         this.cancelledOrdersUpdates$ = new rxjs_1.Subject();
         this.activeStatsUpdates$ = new rxjs_1.Subject();
@@ -166,11 +166,11 @@ class InstanceTraderService extends ws_service_1.BaseWebsocketService {
     closedOpEventHandler(data) {
         this.closedOpsUpdates$.next(data);
     }
-    operationOpenErrorEventHandler(data) {
-        this.operationsOpenErrors$.next(data);
+    operationOpenErrorEventHandler(operationId) {
+        this.operationsOpenErrors$.next(operationId);
     }
-    operationCloseErrorEventHandler(data) {
-        this.operationsCloseErrors$.next(data);
+    operationCloseErrorEventHandler(operationId) {
+        this.operationsCloseErrors$.next(operationId);
     }
     activeStatsEventHandler(data) {
         this.activeStatsUpdates$.next(data);

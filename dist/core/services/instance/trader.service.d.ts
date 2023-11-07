@@ -1,10 +1,10 @@
+import { Observable } from 'rxjs';
 import { ExchangesMarkets } from '../../../models/common/exchanges-markets.type';
 import { ExchangeOperationType } from '../../../models/common/exchange-operation-type';
 import { IOperationStats, ITraderOperation } from '../../../models/trader/operation.model';
 import { ITraderOpenOrderOpts } from '../../../models/trader/open-order-config.model';
 import { ITraderCloseOrderOpts } from '../../../models/trader/close-order-config.model';
 import { BaseWebsocketService, IStandardWsError } from '../base/ws.service';
-import { Observable } from 'rxjs';
 export interface IActiveStatsUpdate {
     sym: string;
     xm: ExchangesMarkets;
@@ -12,11 +12,11 @@ export interface IActiveStatsUpdate {
 }
 export declare class InstanceTraderService extends BaseWebsocketService {
     private readonly httpClient;
+    private readonly operationsOpenErrors$;
+    private readonly operationsCloseErrors$;
     private readonly openedOpsUpdates$;
     private readonly closedOpsUpdates$;
     private readonly liquidatedOpsUpdates$;
-    private readonly operationsOpenErrors$;
-    private readonly operationsCloseErrors$;
     private readonly rejectedOrdersUpdates$;
     private readonly cancelledOrdersUpdates$;
     private readonly activeStatsUpdates$;
@@ -28,8 +28,8 @@ export declare class InstanceTraderService extends BaseWebsocketService {
     subscribeLiquidatedOperationsUpdates(): Observable<ITraderOperation>;
     subscribeCancelledOrdersUpdates(): Observable<ITraderOperation>;
     subscribeRejectedOrdersUpdates(): Observable<ITraderOperation>;
-    subscribeOperationsOpenErrors(): Observable<ITraderOperation>;
-    subscribeOperationsCloseErrors(): Observable<ITraderOperation>;
+    subscribeOperationsOpenErrors(): Observable<string>;
+    subscribeOperationsCloseErrors(): Observable<string>;
     hasOperationOpen(xm: ExchangesMarkets, symbol: string, type: ExchangeOperationType): Promise<boolean>;
     getClosedOperation(operationId: string): Promise<ITraderOperation>;
     createNewOperation(opts: ITraderOpenOrderOpts): Promise<string | null>;

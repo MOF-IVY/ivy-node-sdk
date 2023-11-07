@@ -1,4 +1,5 @@
 import axios, { Axios } from 'axios';
+import { Observable, Subject, filter, take, tap } from 'rxjs';
 
 import { ExchangesMarkets } from '../../../models/common/exchanges-markets.type';
 import { ExchangeOperationType } from '../../../models/common/exchange-operation-type';
@@ -11,7 +12,6 @@ import { IBaseResponse } from '../../../models/common/base-response.model';
 import { ITraderOpenOrderOpts } from '../../../models/trader/open-order-config.model';
 import { ITraderCloseOrderOpts } from '../../../models/trader/close-order-config.model';
 import { BaseWebsocketService, IStandardWsError } from '../base/ws.service';
-import { Observable, Subject, filter, take, tap } from 'rxjs';
 
 export interface IActiveStatsUpdate {
   sym: string;
@@ -22,11 +22,11 @@ export interface IActiveStatsUpdate {
 export class InstanceTraderService extends BaseWebsocketService {
   private readonly httpClient: Axios;
 
+  private readonly operationsOpenErrors$ = new Subject<string>();
+  private readonly operationsCloseErrors$ = new Subject<string>();
   private readonly openedOpsUpdates$ = new Subject<ITraderOperation>();
   private readonly closedOpsUpdates$ = new Subject<ITraderOperation>();
   private readonly liquidatedOpsUpdates$ = new Subject<ITraderOperation>();
-  private readonly operationsOpenErrors$ = new Subject<ITraderOperation>();
-  private readonly operationsCloseErrors$ = new Subject<ITraderOperation>();
   private readonly rejectedOrdersUpdates$ = new Subject<ITraderOperation>();
   private readonly cancelledOrdersUpdates$ = new Subject<ITraderOperation>();
 
@@ -122,11 +122,11 @@ export class InstanceTraderService extends BaseWebsocketService {
     return this.rejectedOrdersUpdates$.asObservable();
   }
 
-  subscribeOperationsOpenErrors(): Observable<ITraderOperation> {
+  subscribeOperationsOpenErrors(): Observable<string> {
     return this.operationsOpenErrors$.asObservable();
   }
 
-  subscribeOperationsCloseErrors(): Observable<ITraderOperation> {
+  subscribeOperationsCloseErrors(): Observable<string> {
     return this.operationsCloseErrors$.asObservable();
   }
 
@@ -246,12 +246,12 @@ export class InstanceTraderService extends BaseWebsocketService {
     this.closedOpsUpdates$.next(data);
   }
 
-  private operationOpenErrorEventHandler(data: ITraderOperation) {
-    this.operationsOpenErrors$.next(data);
+  private operationOpenErrorEventHandler(operationId: string) {
+    this.operationsOpenErrors$.next(operationId);
   }
 
-  private operationCloseErrorEventHandler(data: ITraderOperation) {
-    this.operationsCloseErrors$.next(data);
+  private operationCloseErrorEventHandler(operationId: string) {
+    this.operationsCloseErrors$.next(operationId);
   }
 
   private activeStatsEventHandler(data: {

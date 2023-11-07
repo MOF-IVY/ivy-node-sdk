@@ -104,11 +104,11 @@ export declare class IvySDK<ScriptConfigType = Record<string, any>> {
     /**
      * Always active stream
      */
-    subscribeOperationsOpenErrors(): Observable<import("../main").ITraderOperation<unknown>>;
+    subscribeOperationsOpenErrors(): Observable<string>;
     /**
      * Always active stream
      */
-    subscribeOperationsCloseErrors(): Observable<import("../main").ITraderOperation<unknown>>;
+    subscribeOperationsCloseErrors(): Observable<string>;
     /**
      * Always active stream
      */

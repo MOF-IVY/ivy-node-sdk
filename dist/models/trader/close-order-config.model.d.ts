@@ -12,5 +12,4 @@ export interface ITraderCloseOrderOpts {
      * the order.
      */
     limitPrice?: number;
-    isMockOrder?: boolean;
 }
