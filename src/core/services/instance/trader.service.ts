@@ -136,7 +136,7 @@ export class InstanceTraderService extends BaseWebsocketService {
     type: ExchangeOperationType,
   ): Promise<boolean> {
     const resp = await this.httpClient.get<IBaseResponse<boolean>>(
-      `trader/operation/open/${xm}/${symbol}/${type}`,
+      `trader/operation/open?xm=${xm}&symbol=${symbol}&type=${type}`,
     );
     if (resp.status < 300 && resp.data.statusCode >= 300) {
       throw new Error(`[${resp.data.statusCode}] ${resp.data.message}`);

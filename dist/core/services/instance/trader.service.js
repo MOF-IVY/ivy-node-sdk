@@ -81,7 +81,7 @@ class InstanceTraderService extends ws_service_1.BaseWebsocketService {
     }
     hasOperationOpen(xm, symbol, type) {
         return __awaiter(this, void 0, void 0, function* () {
-            const resp = yield this.httpClient.get(`trader/operation/open/${xm}/${symbol}/${type}`);
+            const resp = yield this.httpClient.get(`trader/operation/open?xm=${xm}&symbol=${symbol}&type=${type}`);
             if (resp.status < 300 && resp.data.statusCode >= 300) {
                 throw new Error(`[${resp.data.statusCode}] ${resp.data.message}`);
             }
