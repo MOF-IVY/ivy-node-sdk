@@ -44,6 +44,7 @@ export declare class IvySDK<ScriptConfigType = Record<string, any>> {
     newOperation(opts: ITraderOpenOrderOpts): Promise<string | null>;
     closeOperation(opts: ITraderCloseOrderOpts): Promise<string | null>;
     cancelOrder(operationId: string, orderType: 'open' | 'close'): Promise<boolean>;
+    getActiveOperationsSymbols(): Promise<string[]>;
     hasOperationOpen(xm: ExchangesMarkets, symbol: string, type: ExchangeOperationType): Promise<boolean>;
     getClosedOperation(operationId: string): Promise<import("../main").ITraderOperation<unknown>>;
     enableIKStream(): Promise<void | import("./services/base/ws.service").IStandardWsError>;

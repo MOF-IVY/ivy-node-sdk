@@ -82,72 +82,49 @@ class InstanceTraderService extends ws_service_1.BaseWebsocketService {
     hasOperationOpen(xm, symbol, type) {
         return __awaiter(this, void 0, void 0, function* () {
             const resp = yield this.httpClient.get(`trader/operation/open?xm=${xm}&symbol=${symbol}&type=${type}`);
-            if (resp.status < 300 && resp.data.statusCode >= 300) {
-                throw new Error(`[${resp.data.statusCode}] ${resp.data.message}`);
-            }
-            if (resp.status >= 300) {
-                throw new Error(`[${InstanceTraderService.name}] http error while trying to get operation open: ${resp.statusText}`);
-            }
+            this.throwIfResponseError(resp);
+            return resp.data.data;
+        });
+    }
+    getActiveOperationsSymbols() {
+        return __awaiter(this, void 0, void 0, function* () {
+            const resp = yield this.httpClient.get(`trader/operation/open/symbols`);
+            this.throwIfResponseError(resp);
             return resp.data.data;
         });
     }
     getClosedOperation(operationId) {
         return __awaiter(this, void 0, void 0, function* () {
             const resp = yield this.httpClient.get(`trader/operation/closed/${operationId}`);
-            if (resp.status < 300 && resp.data.statusCode >= 300) {
-                throw new Error(`[${resp.data.statusCode}] ${resp.data.message}`);
-            }
-            if (resp.status >= 300) {
-                throw new Error(`[${InstanceTraderService.name}] http error while trying to get operation open: ${resp.statusText}`);
-            }
+            this.throwIfResponseError(resp);
             return resp.data.data;
         });
     }
     createNewOperation(opts) {
         return __awaiter(this, void 0, void 0, function* () {
             const resp = yield this.httpClient.post('trader/operation/new', opts);
-            if (resp.status < 300 && resp.data.statusCode >= 300) {
-                throw new Error(`[${resp.data.statusCode}] ${resp.data.message}`);
-            }
-            if (resp.status >= 300) {
-                throw new Error(`[${InstanceTraderService.name}] http error while trying to create a new operation: ${resp.statusText}`);
-            }
+            this.throwIfResponseError(resp);
             return resp.data.data;
         });
     }
     closeOperation(opts) {
         return __awaiter(this, void 0, void 0, function* () {
             const resp = yield this.httpClient.post('trader/operation/close', opts);
-            if (resp.status < 300 && resp.data.statusCode >= 300) {
-                throw new Error(`[${resp.data.statusCode}] ${resp.data.message}`);
-            }
-            if (resp.status >= 300) {
-                throw new Error(`[${InstanceTraderService.name}] http error while trying to close an operation: ${resp.statusText}`);
-            }
+            this.throwIfResponseError(resp);
             return resp.data.data;
         });
     }
     cancelOpenOrder(operationId) {
         return __awaiter(this, void 0, void 0, function* () {
             const resp = yield this.httpClient.delete(`trader/operation/open-order/${operationId}`);
-            if (resp.status < 300 && resp.data.statusCode >= 300) {
-                throw new Error(`[${resp.data.statusCode}] ${resp.data.message}`);
-            }
-            if (resp.status >= 300) {
-                throw new Error(`[${InstanceTraderService.name}] http error while trying to cancel an operation open order: ${resp.statusText}`);
-            }
+            this.throwIfResponseError(resp);
             return resp.data.data;
         });
     }
     cancelCloseOrder(operationId) {
         return __awaiter(this, void 0, void 0, function* () {
             const resp = yield this.httpClient.delete(`trader/operation/close-order/${operationId}`);
-            if (resp.status < 300 && resp.data.statusCode >= 300) {
-                throw new Error(`[${resp.data.statusCode}] ${resp.data.message}`);
-            }
-            if (resp.status >= 300) {
-                throw new Error(`[${InstanceTraderService.name}] http error while trying to cancel an operation close order: ${resp.statusText}`);
-            }
+            this.throwIfResponseError(resp);
             return resp.data.data;
         });
     }
@@ -174,6 +151,12 @@ class InstanceTraderService extends ws_service_1.BaseWebsocketService {
     }
     activeStatsEventHandler(data) {
         this.activeStatsUpdates$.next(data);
+    }
+    throwIfResponseError(resp) {
+        if (resp.status < 300 && resp.data.statusCode >= 300)
+            throw new Error(`[${resp.data.statusCode}] ${resp.data.message}`);
+        if (resp.status >= 300)
+            throw new Error(resp.statusText);
     }
 }
 exports.InstanceTraderService = InstanceTraderService;

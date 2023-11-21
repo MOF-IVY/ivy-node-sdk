@@ -125,6 +125,11 @@ class IvySDK {
             ? this.trader.cancelOpenOrder(operationId)
             : this.trader.cancelCloseOrder(operationId);
     }
+    getActiveOperationsSymbols() {
+        if (this.trader === null)
+            throw new Error(`Trader service disabled`);
+        return this.trader.getActiveOperationsSymbols();
+    }
     hasOperationOpen(xm, symbol, type) {
         if (this.trader === null)
             throw new Error(`Trader service disabled`);

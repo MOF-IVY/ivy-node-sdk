@@ -227,6 +227,11 @@ export class IvySDK<ScriptConfigType = Record<string, any>> {
       : this.trader.cancelCloseOrder(operationId);
   }
 
+  getActiveOperationsSymbols() {
+    if (this.trader === null) throw new Error(`Trader service disabled`);
+    return this.trader.getActiveOperationsSymbols();
+  }
+
   hasOperationOpen(
     xm: ExchangesMarkets,
     symbol: string,

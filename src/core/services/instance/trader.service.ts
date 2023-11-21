@@ -1,4 +1,4 @@
-import axios, { Axios } from 'axios';
+import axios, { Axios, AxiosResponse } from 'axios';
 import { Observable, Subject, filter, take, tap } from 'rxjs';
 
 import { ExchangesMarkets } from '../../../models/common/exchanges-markets.type';
@@ -138,14 +138,19 @@ export class InstanceTraderService extends BaseWebsocketService {
     const resp = await this.httpClient.get<IBaseResponse<boolean>>(
       `trader/operation/open?xm=${xm}&symbol=${symbol}&type=${type}`,
     );
-    if (resp.status < 300 && resp.data.statusCode >= 300) {
-      throw new Error(`[${resp.data.statusCode}] ${resp.data.message}`);
-    }
-    if (resp.status >= 300) {
-      throw new Error(
-        `[${InstanceTraderService.name}] http error while trying to get operation open: ${resp.statusText}`,
-      );
-    }
+
+    this.throwIfResponseError(resp);
+
+    return resp.data.data!;
+  }
+
+  async getActiveOperationsSymbols(): Promise<string[]> {
+    const resp = await this.httpClient.get<IBaseResponse<string[]>>(
+      `trader/operation/open/symbols`,
+    );
+
+    this.throwIfResponseError(resp);
+
     return resp.data.data!;
   }
 
@@ -153,14 +158,9 @@ export class InstanceTraderService extends BaseWebsocketService {
     const resp = await this.httpClient.get<IBaseResponse<ITraderOperation>>(
       `trader/operation/closed/${operationId}`,
     );
-    if (resp.status < 300 && resp.data.statusCode >= 300) {
-      throw new Error(`[${resp.data.statusCode}] ${resp.data.message}`);
-    }
-    if (resp.status >= 300) {
-      throw new Error(
-        `[${InstanceTraderService.name}] http error while trying to get operation open: ${resp.statusText}`,
-      );
-    }
+
+    this.throwIfResponseError(resp);
+
     return resp.data.data!;
   }
 
@@ -169,14 +169,9 @@ export class InstanceTraderService extends BaseWebsocketService {
       'trader/operation/new',
       opts,
     );
-    if (resp.status < 300 && resp.data.statusCode >= 300) {
-      throw new Error(`[${resp.data.statusCode}] ${resp.data.message}`);
-    }
-    if (resp.status >= 300) {
-      throw new Error(
-        `[${InstanceTraderService.name}] http error while trying to create a new operation: ${resp.statusText}`,
-      );
-    }
+
+    this.throwIfResponseError(resp);
+
     return resp.data.data!;
   }
 
@@ -185,14 +180,9 @@ export class InstanceTraderService extends BaseWebsocketService {
       'trader/operation/close',
       opts,
     );
-    if (resp.status < 300 && resp.data.statusCode >= 300) {
-      throw new Error(`[${resp.data.statusCode}] ${resp.data.message}`);
-    }
-    if (resp.status >= 300) {
-      throw new Error(
-        `[${InstanceTraderService.name}] http error while trying to close an operation: ${resp.statusText}`,
-      );
-    }
+
+    this.throwIfResponseError(resp);
+
     return resp.data.data!;
   }
 
@@ -200,14 +190,9 @@ export class InstanceTraderService extends BaseWebsocketService {
     const resp = await this.httpClient.delete<IBaseResponse<boolean>>(
       `trader/operation/open-order/${operationId}`,
     );
-    if (resp.status < 300 && resp.data.statusCode >= 300) {
-      throw new Error(`[${resp.data.statusCode}] ${resp.data.message}`);
-    }
-    if (resp.status >= 300) {
-      throw new Error(
-        `[${InstanceTraderService.name}] http error while trying to cancel an operation open order: ${resp.statusText}`,
-      );
-    }
+
+    this.throwIfResponseError(resp);
+
     return resp.data.data!;
   }
 
@@ -215,14 +200,9 @@ export class InstanceTraderService extends BaseWebsocketService {
     const resp = await this.httpClient.delete<IBaseResponse<boolean>>(
       `trader/operation/close-order/${operationId}`,
     );
-    if (resp.status < 300 && resp.data.statusCode >= 300) {
-      throw new Error(`[${resp.data.statusCode}] ${resp.data.message}`);
-    }
-    if (resp.status >= 300) {
-      throw new Error(
-        `[${InstanceTraderService.name}] http error while trying to cancel an operation close order: ${resp.statusText}`,
-      );
-    }
+
+    this.throwIfResponseError(resp);
+
     return resp.data.data!;
   }
 
@@ -260,5 +240,11 @@ export class InstanceTraderService extends BaseWebsocketService {
     stats: IOperationStats;
   }) {
     this.activeStatsUpdates$.next(data);
+  }
+
+  private throwIfResponseError(resp: AxiosResponse<IBaseResponse<any>>) {
+    if (resp.status < 300 && resp.data.statusCode >= 300)
+      throw new Error(`[${resp.data.statusCode}] ${resp.data.message}`);
+    if (resp.status >= 300) throw new Error(resp.statusText);
   }
 }
