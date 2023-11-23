@@ -32,10 +32,12 @@ export abstract class BaseWebsocketService {
         );
       });
     });
+
     this.socket.on('connect', () => {
       this.ready$.next(false);
       if (ENVConfig.verboseMode) console.log(`[${address}] connected`);
     });
+
     this.socket.on('disconnect', () => {
       this.ready$.next(false);
       if (ENVConfig.verboseMode) console.log(`[${address}] disconnected`);

@@ -21,6 +21,7 @@ export declare class InstanceTraderService extends BaseWebsocketService {
     private readonly cancelledOrdersUpdates$;
     private readonly activeStatsUpdates$;
     constructor(restAddress: string, wsAddress: string, apiKey: string);
+    subscribeReady(): Observable<boolean>;
     enableActiveStatsUpdates(): Promise<void | IStandardWsError>;
     subscribeActiveStatsUpdates(): Observable<IActiveStatsUpdate>;
     subscribeOpenedOperationsUpdates(): Observable<ITraderOperation>;
@@ -30,6 +31,7 @@ export declare class InstanceTraderService extends BaseWebsocketService {
     subscribeRejectedOrdersUpdates(): Observable<ITraderOperation>;
     subscribeOperationsOpenErrors(): Observable<string>;
     subscribeOperationsCloseErrors(): Observable<string>;
+    isReady(): Promise<boolean>;
     hasOperationOpen(xm: ExchangesMarkets, symbol: string, type: ExchangeOperationType): Promise<boolean>;
     getActiveOperationsSymbols(): Promise<string[]>;
     getClosedOperation(operationId: string): Promise<ITraderOperation>;

@@ -47,6 +47,15 @@ class InstanceTraderService extends ws_service_1.BaseWebsocketService {
         }))
             .subscribe();
     }
+    subscribeReady() {
+        const traderReady$ = new rxjs_1.Subject();
+        new Promise((r) => __awaiter(this, void 0, void 0, function* () {
+            while (!(yield this.isReady()))
+                yield new Promise((_) => setTimeout(() => _(), 100));
+            traderReady$.next(true);
+        }));
+        return (0, rxjs_1.combineLatest)([super.subscribeReady(), traderReady$]).pipe((0, rxjs_1.filter)(([wsReady, traderReady]) => !!wsReady && !!traderReady), (0, rxjs_1.take)(1), (0, rxjs_1.map)(() => true));
+    }
     enableActiveStatsUpdates() {
         return new Promise((resolve) => {
             this.socket.on('active-operation-stats-event', this.activeStatsEventHandler.bind(this));
@@ -78,6 +87,13 @@ class InstanceTraderService extends ws_service_1.BaseWebsocketService {
     }
     subscribeOperationsCloseErrors() {
         return this.operationsCloseErrors$.asObservable();
+    }
+    isReady() {
+        return __awaiter(this, void 0, void 0, function* () {
+            const resp = yield this.httpClient.get(`trader/ready`);
+            this.throwIfResponseError(resp);
+            return resp.data.data;
+        });
     }
     hasOperationOpen(xm, symbol, type) {
         return __awaiter(this, void 0, void 0, function* () {
