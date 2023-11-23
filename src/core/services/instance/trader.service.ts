@@ -89,21 +89,6 @@ export class InstanceTraderService extends BaseWebsocketService {
       .subscribe();
   }
 
-  override subscribeReady(): Observable<boolean> {
-    const traderReady$ = new Subject<boolean>();
-    new Promise<void>(async (r) => {
-      while (!(await this.isReady()))
-        await new Promise<void>((_) => setTimeout(() => _(), 100));
-      traderReady$.next(true);
-    });
-
-    return combineLatest([super.subscribeReady(), traderReady$]).pipe(
-      filter(([wsReady, traderReady]) => !!wsReady && !!traderReady),
-      take(1),
-      map(() => true),
-    );
-  }
-
   enableActiveStatsUpdates(): Promise<void | IStandardWsError> {
     return new Promise((resolve) => {
       this.socket.on(

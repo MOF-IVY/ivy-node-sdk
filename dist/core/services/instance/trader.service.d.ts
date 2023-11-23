@@ -21,7 +21,6 @@ export declare class InstanceTraderService extends BaseWebsocketService {
     private readonly cancelledOrdersUpdates$;
     private readonly activeStatsUpdates$;
     constructor(restAddress: string, wsAddress: string, apiKey: string);
-    subscribeReady(): Observable<boolean>;
     enableActiveStatsUpdates(): Promise<void | IStandardWsError>;
     subscribeActiveStatsUpdates(): Observable<IActiveStatsUpdate>;
     subscribeOpenedOperationsUpdates(): Observable<ITraderOperation>;
