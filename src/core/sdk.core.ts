@@ -185,6 +185,11 @@ export class IvySDK<ScriptConfigType = Record<string, any>> {
     throw new Error('Not implemented');
   }
 
+  get traderReady() {
+    if (!this.trader) return Promise.resolve(false);
+    return this.trader?.isReady();
+  }
+
   log(
     message: string | object,
     key: string,

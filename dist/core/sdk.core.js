@@ -92,6 +92,12 @@ class IvySDK {
     clearLogs(keys) {
         throw new Error('Not implemented');
     }
+    get traderReady() {
+        var _a;
+        if (!this.trader)
+            return Promise.resolve(false);
+        return (_a = this.trader) === null || _a === void 0 ? void 0 : _a.isReady();
+    }
     log(message, key, persist = false, logToConsole = true) {
         if (this.loggingCenter === null)
             throw new Error(`Logging center service disabled`);

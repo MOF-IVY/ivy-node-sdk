@@ -37,6 +37,7 @@ export declare class IvySDK<ScriptConfigType = Record<string, any>> {
     constructor(opts?: ISDKConfigOpts);
     subscribeReady(): Observable<boolean>;
     clearLogs(keys: string[]): void;
+    get traderReady(): Promise<boolean>;
     log(message: string | object, key: string, persist?: boolean, logToConsole?: boolean): void;
     initConfig(config: ScriptConfigType): Promise<ScriptConfigType>;
     getConfig(): Promise<ScriptConfigType>;
