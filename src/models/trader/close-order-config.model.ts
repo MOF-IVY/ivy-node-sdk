@@ -16,5 +16,5 @@ export interface ITraderCloseOrderOpts {
    * If not given it will use the most recent price to place
    * the order.
    */
-  limitPrice?: number;
+  price?: number;
 }

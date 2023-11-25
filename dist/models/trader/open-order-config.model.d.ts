@@ -7,7 +7,7 @@ export interface ITraderOpenOrderOpts {
     /**
      * Required if order type is Limit
      */
-    limitPrice?: number;
+    price?: number;
     /**
      * From exchange market, in case of bybit,
      * the category will be deduced from the
