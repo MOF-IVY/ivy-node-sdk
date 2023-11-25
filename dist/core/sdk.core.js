@@ -136,10 +136,10 @@ class IvySDK {
             throw new Error(`Trader service disabled`);
         return this.trader.getActiveOperationsSymbols();
     }
-    hasOperationOpen(xm, symbol, type) {
+    hasActiveOperation(xm, symbol, type) {
         if (this.trader === null)
             throw new Error(`Trader service disabled`);
-        return this.trader.hasOperationOpen(xm, symbol, type);
+        return this.trader.hasActiveOperation(xm, symbol, type);
     }
     getClosedOperation(operationId) {
         if (this.trader === null)
@@ -178,10 +178,10 @@ class IvySDK {
     disableDumpStream(payload) {
         return this.pumpdump.disableDumpStream(payload);
     }
-    enableActiveStatsUpdate() {
+    enableActiveOperationsStatsUpdates() {
         if (this.trader === null)
             throw new Error(`Trader service disabled`);
-        return this.trader.enableActiveStatsUpdates();
+        return this.trader.enableActiveOperationsStatsUpdates();
     }
     /**
      * Always active stream
@@ -228,66 +228,66 @@ class IvySDK {
     /**
      * Always active stream
      */
-    subscribeOpenedOperationsUpdates() {
+    subscribeNewActiveOperationsEvents() {
         if (this.trader === null)
             throw new Error(`Trader service disabled`);
-        return this.trader.subscribeOpenedOperationsUpdates();
+        return this.trader.subscribeNewActiveOperationsEvents();
     }
     /**
      * Always active stream
      */
-    subscribeOperationsOpenErrors() {
+    subscribeOperationsOpenErrorsEvents() {
         if (this.trader === null)
             throw new Error(`Trader service disabled`);
-        return this.trader.subscribeOperationsOpenErrors();
+        return this.trader.subscribeOperationsOpenErrorsEvents();
     }
     /**
      * Always active stream
      */
-    subscribeOperationsCloseErrors() {
+    subscribeOperationsCloseErrorsEvents() {
         if (this.trader === null)
             throw new Error(`Trader service disabled`);
-        return this.trader.subscribeOperationsCloseErrors();
+        return this.trader.subscribeOperationsCloseErrorsEvents();
     }
     /**
      * Always active stream
      */
-    subscribeClosedOperationsUpdates() {
+    subscribeClosedOperationsEvents() {
         if (this.trader === null)
             throw new Error(`Trader service disabled`);
-        return this.trader.subscribeClosedOperationsUpdates();
+        return this.trader.subscribeClosedOperationsEvents();
     }
     /**
      * Always active stream
      */
-    subscribeLiquidatedOperationsUpdates() {
+    subscribeLiquidatedOperationsEvents() {
         if (this.trader === null)
             throw new Error(`Trader service disabled`);
-        return this.trader.subscribeLiquidatedOperationsUpdates();
+        return this.trader.subscribeLiquidatedOperationsEvents();
     }
     /**
      * Always active stream
      */
-    subscribeRejectedOrdersUpdates() {
+    subscribeRejectedOrdersEvents() {
         if (this.trader === null)
             throw new Error(`Trader service disabled`);
-        return this.trader.subscribeRejectedOrdersUpdates();
+        return this.trader.subscribeRejectedOrdersEvents();
     }
     /**
      * Always active stream
      */
-    subscribeCancelledOrdersUpdates() {
+    subscribeCancelledOrdersEvents() {
         if (this.trader === null)
             throw new Error(`Trader service disabled`);
-        return this.trader.subscribeCancelledOrdersUpdates();
+        return this.trader.subscribeCancelledOrdersEvents();
     }
     /**
      * Stream active after activation request
      */
-    subscribeActiveStatsUpdates() {
+    subscribeActiveOperationsStatsUpdates() {
         if (this.trader === null)
             throw new Error(`Trader service disabled`);
-        return this.trader.subscribeActiveStatsUpdates();
+        return this.trader.subscribeActiveOperationsStatsUpdates();
     }
     /**
      * Stream active after activation request

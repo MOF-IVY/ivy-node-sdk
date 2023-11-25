@@ -22,15 +22,16 @@ export interface IActiveStatsUpdate {
 export class InstanceTraderService extends BaseWebsocketService {
   private readonly httpClient: Axios;
 
-  private readonly operationsOpenErrors$ = new Subject<string>();
-  private readonly operationsCloseErrors$ = new Subject<string>();
-  private readonly openedOpsUpdates$ = new Subject<ITraderOperation>();
-  private readonly closedOpsUpdates$ = new Subject<ITraderOperation>();
-  private readonly liquidatedOpsUpdates$ = new Subject<ITraderOperation>();
-  private readonly rejectedOrdersUpdates$ = new Subject<ITraderOperation>();
-  private readonly cancelledOrdersUpdates$ = new Subject<ITraderOperation>();
+  private readonly operationsOpenErrorsEvents$ = new Subject<string>();
+  private readonly operationsCloseErrorsEvents$ = new Subject<string>();
+  private readonly newActiveOpsEvents$ = new Subject<ITraderOperation>();
+  private readonly closedOpsEvents$ = new Subject<ITraderOperation>();
+  private readonly liquidatedOpsEvents$ = new Subject<ITraderOperation>();
+  private readonly rejectedOrdersEvents$ = new Subject<ITraderOperation>();
+  private readonly cancelledOrdersEvents$ = new Subject<ITraderOperation>();
 
-  private readonly activeStatsUpdates$ = new Subject<IActiveStatsUpdate>();
+  private readonly activeOperationsStatsUpdates$ =
+    new Subject<IActiveStatsUpdate>();
 
   constructor(restAddress: string, wsAddress: string, apiKey: string) {
     super(wsAddress);
@@ -81,11 +82,11 @@ export class InstanceTraderService extends BaseWebsocketService {
       .subscribe();
   }
 
-  enableActiveStatsUpdates(): Promise<void | IStandardWsError> {
+  enableActiveOperationsStatsUpdates(): Promise<void | IStandardWsError> {
     return new Promise((resolve) => {
       this.socket.on(
         'active-operation-stats-event',
-        this.activeStatsEventHandler.bind(this),
+        this.activeOperationsStatsEventHandler.bind(this),
       );
       this.socket.once(
         'subscribe-active-operations-stats-updates-error',
@@ -99,36 +100,36 @@ export class InstanceTraderService extends BaseWebsocketService {
     });
   }
 
-  subscribeActiveStatsUpdates(): Observable<IActiveStatsUpdate> {
-    return this.activeStatsUpdates$.asObservable();
+  subscribeActiveOperationsStatsUpdates(): Observable<IActiveStatsUpdate> {
+    return this.activeOperationsStatsUpdates$.asObservable();
   }
 
-  subscribeOpenedOperationsUpdates(): Observable<ITraderOperation> {
-    return this.openedOpsUpdates$.asObservable();
+  subscribeNewActiveOperationsEvents(): Observable<ITraderOperation> {
+    return this.newActiveOpsEvents$.asObservable();
   }
 
-  subscribeClosedOperationsUpdates(): Observable<ITraderOperation> {
-    return this.closedOpsUpdates$.asObservable();
+  subscribeClosedOperationsEvents(): Observable<ITraderOperation> {
+    return this.closedOpsEvents$.asObservable();
   }
 
-  subscribeLiquidatedOperationsUpdates(): Observable<ITraderOperation> {
-    return this.liquidatedOpsUpdates$.asObservable();
+  subscribeLiquidatedOperationsEvents(): Observable<ITraderOperation> {
+    return this.liquidatedOpsEvents$.asObservable();
   }
 
-  subscribeCancelledOrdersUpdates(): Observable<ITraderOperation> {
-    return this.cancelledOrdersUpdates$.asObservable();
+  subscribeCancelledOrdersEvents(): Observable<ITraderOperation> {
+    return this.cancelledOrdersEvents$.asObservable();
   }
 
-  subscribeRejectedOrdersUpdates(): Observable<ITraderOperation> {
-    return this.rejectedOrdersUpdates$.asObservable();
+  subscribeRejectedOrdersEvents(): Observable<ITraderOperation> {
+    return this.rejectedOrdersEvents$.asObservable();
   }
 
-  subscribeOperationsOpenErrors(): Observable<string> {
-    return this.operationsOpenErrors$.asObservable();
+  subscribeOperationsOpenErrorsEvents(): Observable<string> {
+    return this.operationsOpenErrorsEvents$.asObservable();
   }
 
-  subscribeOperationsCloseErrors(): Observable<string> {
-    return this.operationsCloseErrors$.asObservable();
+  subscribeOperationsCloseErrorsEvents(): Observable<string> {
+    return this.operationsCloseErrorsEvents$.asObservable();
   }
 
   async isReady(): Promise<boolean> {
@@ -141,7 +142,7 @@ export class InstanceTraderService extends BaseWebsocketService {
     return resp.data.data!;
   }
 
-  async hasOperationOpen(
+  async hasActiveOperation(
     xm: ExchangesMarkets,
     symbol: string,
     type: ExchangeOperationType,
@@ -157,7 +158,7 @@ export class InstanceTraderService extends BaseWebsocketService {
 
   async getActiveOperationsSymbols(): Promise<string[]> {
     const resp = await this.httpClient.get<IBaseResponse<string[]>>(
-      `operations/active/symbols/list`,
+      `trader/operations/active/symbols/list`,
     );
 
     this.throwIfResponseError(resp);
@@ -218,39 +219,39 @@ export class InstanceTraderService extends BaseWebsocketService {
   }
 
   private liquidatedOpEventHandler(data: ITraderOperation) {
-    this.liquidatedOpsUpdates$.next(data);
+    this.liquidatedOpsEvents$.next(data);
   }
 
   private cancelledOrdersEventHandler(data: ITraderOperation) {
-    this.cancelledOrdersUpdates$.next(data);
+    this.cancelledOrdersEvents$.next(data);
   }
 
   private rejectedOrdersEventHandler(data: ITraderOperation) {
-    this.rejectedOrdersUpdates$.next(data);
+    this.rejectedOrdersEvents$.next(data);
   }
 
   private openedOpEventHandler(data: ITraderOperation) {
-    this.openedOpsUpdates$.next(data);
+    this.newActiveOpsEvents$.next(data);
   }
 
   private closedOpEventHandler(data: ITraderOperation) {
-    this.closedOpsUpdates$.next(data);
+    this.closedOpsEvents$.next(data);
   }
 
   private operationOpenErrorEventHandler(operationId: string) {
-    this.operationsOpenErrors$.next(operationId);
+    this.operationsOpenErrorsEvents$.next(operationId);
   }
 
   private operationCloseErrorEventHandler(operationId: string) {
-    this.operationsCloseErrors$.next(operationId);
+    this.operationsCloseErrorsEvents$.next(operationId);
   }
 
-  private activeStatsEventHandler(data: {
+  private activeOperationsStatsEventHandler(data: {
     sym: string;
     xm: ExchangesMarkets;
     stats: IOperationStats;
   }) {
-    this.activeStatsUpdates$.next(data);
+    this.activeOperationsStatsUpdates$.next(data);
   }
 
   private throwIfResponseError(resp: AxiosResponse<IBaseResponse<any>>) {

@@ -12,26 +12,26 @@ export interface IActiveStatsUpdate {
 }
 export declare class InstanceTraderService extends BaseWebsocketService {
     private readonly httpClient;
-    private readonly operationsOpenErrors$;
-    private readonly operationsCloseErrors$;
-    private readonly openedOpsUpdates$;
-    private readonly closedOpsUpdates$;
-    private readonly liquidatedOpsUpdates$;
-    private readonly rejectedOrdersUpdates$;
-    private readonly cancelledOrdersUpdates$;
-    private readonly activeStatsUpdates$;
+    private readonly operationsOpenErrorsEvents$;
+    private readonly operationsCloseErrorsEvents$;
+    private readonly newActiveOpsEvents$;
+    private readonly closedOpsEvents$;
+    private readonly liquidatedOpsEvents$;
+    private readonly rejectedOrdersEvents$;
+    private readonly cancelledOrdersEvents$;
+    private readonly activeOperationsStatsUpdates$;
     constructor(restAddress: string, wsAddress: string, apiKey: string);
-    enableActiveStatsUpdates(): Promise<void | IStandardWsError>;
-    subscribeActiveStatsUpdates(): Observable<IActiveStatsUpdate>;
-    subscribeOpenedOperationsUpdates(): Observable<ITraderOperation>;
-    subscribeClosedOperationsUpdates(): Observable<ITraderOperation>;
-    subscribeLiquidatedOperationsUpdates(): Observable<ITraderOperation>;
-    subscribeCancelledOrdersUpdates(): Observable<ITraderOperation>;
-    subscribeRejectedOrdersUpdates(): Observable<ITraderOperation>;
-    subscribeOperationsOpenErrors(): Observable<string>;
-    subscribeOperationsCloseErrors(): Observable<string>;
+    enableActiveOperationsStatsUpdates(): Promise<void | IStandardWsError>;
+    subscribeActiveOperationsStatsUpdates(): Observable<IActiveStatsUpdate>;
+    subscribeNewActiveOperationsEvents(): Observable<ITraderOperation>;
+    subscribeClosedOperationsEvents(): Observable<ITraderOperation>;
+    subscribeLiquidatedOperationsEvents(): Observable<ITraderOperation>;
+    subscribeCancelledOrdersEvents(): Observable<ITraderOperation>;
+    subscribeRejectedOrdersEvents(): Observable<ITraderOperation>;
+    subscribeOperationsOpenErrorsEvents(): Observable<string>;
+    subscribeOperationsCloseErrorsEvents(): Observable<string>;
     isReady(): Promise<boolean>;
-    hasOperationOpen(xm: ExchangesMarkets, symbol: string, type: ExchangeOperationType): Promise<boolean>;
+    hasActiveOperation(xm: ExchangesMarkets, symbol: string, type: ExchangeOperationType): Promise<boolean>;
     getActiveOperationsSymbols(): Promise<string[]>;
     getClosedOperation(operationId: string): Promise<ITraderOperation>;
     createNewOperation(opts: ITraderOpenOrderOpts): Promise<string | null>;
@@ -45,6 +45,6 @@ export declare class InstanceTraderService extends BaseWebsocketService {
     private closedOpEventHandler;
     private operationOpenErrorEventHandler;
     private operationCloseErrorEventHandler;
-    private activeStatsEventHandler;
+    private activeOperationsStatsEventHandler;
     private throwIfResponseError;
 }

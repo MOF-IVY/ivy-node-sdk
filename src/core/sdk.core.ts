@@ -1,4 +1,4 @@
-import { Observable, filter, map, of, take, tap, zip } from 'rxjs';
+import { Observable, filter, map, of, zip } from 'rxjs';
 import { ENVConfig } from './config/config/config.core';
 
 import { ExchangesMarkets } from '../models/common/exchanges-markets.type';
@@ -237,13 +237,13 @@ export class IvySDK<ScriptConfigType = Record<string, any>> {
     return this.trader.getActiveOperationsSymbols();
   }
 
-  hasOperationOpen(
+  hasActiveOperation(
     xm: ExchangesMarkets,
     symbol: string,
     type: ExchangeOperationType,
   ) {
     if (this.trader === null) throw new Error(`Trader service disabled`);
-    return this.trader.hasOperationOpen(xm, symbol, type);
+    return this.trader.hasActiveOperation(xm, symbol, type);
   }
 
   getClosedOperation(operationId: string) {
@@ -287,9 +287,9 @@ export class IvySDK<ScriptConfigType = Record<string, any>> {
     return this.pumpdump.disableDumpStream(payload);
   }
 
-  enableActiveStatsUpdate() {
+  enableActiveOperationsStatsUpdates() {
     if (this.trader === null) throw new Error(`Trader service disabled`);
-    return this.trader.enableActiveStatsUpdates();
+    return this.trader.enableActiveOperationsStatsUpdates();
   }
 
   /**
@@ -340,65 +340,65 @@ export class IvySDK<ScriptConfigType = Record<string, any>> {
   /**
    * Always active stream
    */
-  subscribeOpenedOperationsUpdates() {
+  subscribeNewActiveOperationsEvents() {
     if (this.trader === null) throw new Error(`Trader service disabled`);
-    return this.trader.subscribeOpenedOperationsUpdates();
+    return this.trader.subscribeNewActiveOperationsEvents();
   }
 
   /**
    * Always active stream
    */
-  subscribeOperationsOpenErrors() {
+  subscribeOperationsOpenErrorsEvents() {
     if (this.trader === null) throw new Error(`Trader service disabled`);
-    return this.trader.subscribeOperationsOpenErrors();
+    return this.trader.subscribeOperationsOpenErrorsEvents();
   }
 
   /**
    * Always active stream
    */
-  subscribeOperationsCloseErrors() {
+  subscribeOperationsCloseErrorsEvents() {
     if (this.trader === null) throw new Error(`Trader service disabled`);
-    return this.trader.subscribeOperationsCloseErrors();
+    return this.trader.subscribeOperationsCloseErrorsEvents();
   }
 
   /**
    * Always active stream
    */
-  subscribeClosedOperationsUpdates() {
+  subscribeClosedOperationsEvents() {
     if (this.trader === null) throw new Error(`Trader service disabled`);
-    return this.trader.subscribeClosedOperationsUpdates();
+    return this.trader.subscribeClosedOperationsEvents();
   }
 
   /**
    * Always active stream
    */
-  subscribeLiquidatedOperationsUpdates() {
+  subscribeLiquidatedOperationsEvents() {
     if (this.trader === null) throw new Error(`Trader service disabled`);
-    return this.trader.subscribeLiquidatedOperationsUpdates();
+    return this.trader.subscribeLiquidatedOperationsEvents();
   }
 
   /**
    * Always active stream
    */
-  subscribeRejectedOrdersUpdates() {
+  subscribeRejectedOrdersEvents() {
     if (this.trader === null) throw new Error(`Trader service disabled`);
-    return this.trader.subscribeRejectedOrdersUpdates();
+    return this.trader.subscribeRejectedOrdersEvents();
   }
 
   /**
    * Always active stream
    */
-  subscribeCancelledOrdersUpdates() {
+  subscribeCancelledOrdersEvents() {
     if (this.trader === null) throw new Error(`Trader service disabled`);
-    return this.trader.subscribeCancelledOrdersUpdates();
+    return this.trader.subscribeCancelledOrdersEvents();
   }
 
   /**
    * Stream active after activation request
    */
-  subscribeActiveStatsUpdates() {
+  subscribeActiveOperationsStatsUpdates() {
     if (this.trader === null) throw new Error(`Trader service disabled`);
-    return this.trader.subscribeActiveStatsUpdates();
+    return this.trader.subscribeActiveOperationsStatsUpdates();
   }
 
   /**

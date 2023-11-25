@@ -46,7 +46,7 @@ export declare class IvySDK<ScriptConfigType = Record<string, any>> {
     closeOperation(opts: ITraderCloseOrderOpts): Promise<string | null>;
     cancelOrder(operationId: string, orderType: 'open' | 'close'): Promise<boolean>;
     getActiveOperationsSymbols(): Promise<string[]>;
-    hasOperationOpen(xm: ExchangesMarkets, symbol: string, type: ExchangeOperationType): Promise<boolean>;
+    hasActiveOperation(xm: ExchangesMarkets, symbol: string, type: ExchangeOperationType): Promise<boolean>;
     getClosedOperation(operationId: string): Promise<import("../main").ITraderOperation<unknown>>;
     enableIKStream(): Promise<void | import("./services/base/ws.service").IStandardWsError>;
     disableIKStream(): Promise<void | import("./services/base/ws.service").IStandardWsError>;
@@ -66,7 +66,7 @@ export declare class IvySDK<ScriptConfigType = Record<string, any>> {
     disableDumpStream(payload: {
         xm: ExchangesMarkets;
     }): Promise<void | import("./services/base/ws.service").IStandardWsError>;
-    enableActiveStatsUpdate(): Promise<void | import("./services/base/ws.service").IStandardWsError>;
+    enableActiveOperationsStatsUpdates(): Promise<void | import("./services/base/ws.service").IStandardWsError>;
     /**
      * Always active stream
      *
@@ -102,35 +102,35 @@ export declare class IvySDK<ScriptConfigType = Record<string, any>> {
     /**
      * Always active stream
      */
-    subscribeOpenedOperationsUpdates(): Observable<import("../main").ITraderOperation<unknown>>;
+    subscribeNewActiveOperationsEvents(): Observable<import("../main").ITraderOperation<unknown>>;
     /**
      * Always active stream
      */
-    subscribeOperationsOpenErrors(): Observable<string>;
+    subscribeOperationsOpenErrorsEvents(): Observable<string>;
     /**
      * Always active stream
      */
-    subscribeOperationsCloseErrors(): Observable<string>;
+    subscribeOperationsCloseErrorsEvents(): Observable<string>;
     /**
      * Always active stream
      */
-    subscribeClosedOperationsUpdates(): Observable<import("../main").ITraderOperation<unknown>>;
+    subscribeClosedOperationsEvents(): Observable<import("../main").ITraderOperation<unknown>>;
     /**
      * Always active stream
      */
-    subscribeLiquidatedOperationsUpdates(): Observable<import("../main").ITraderOperation<unknown>>;
+    subscribeLiquidatedOperationsEvents(): Observable<import("../main").ITraderOperation<unknown>>;
     /**
      * Always active stream
      */
-    subscribeRejectedOrdersUpdates(): Observable<import("../main").ITraderOperation<unknown>>;
+    subscribeRejectedOrdersEvents(): Observable<import("../main").ITraderOperation<unknown>>;
     /**
      * Always active stream
      */
-    subscribeCancelledOrdersUpdates(): Observable<import("../main").ITraderOperation<unknown>>;
+    subscribeCancelledOrdersEvents(): Observable<import("../main").ITraderOperation<unknown>>;
     /**
      * Stream active after activation request
      */
-    subscribeActiveStatsUpdates(): Observable<import("./services/instance/trader.service").IActiveStatsUpdate>;
+    subscribeActiveOperationsStatsUpdates(): Observable<import("./services/instance/trader.service").IActiveStatsUpdate>;
     /**
      * Stream active after activation request
      */

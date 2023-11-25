@@ -19,14 +19,14 @@ const ws_service_1 = require("../base/ws.service");
 class InstanceTraderService extends ws_service_1.BaseWebsocketService {
     constructor(restAddress, wsAddress, apiKey) {
         super(wsAddress);
-        this.operationsOpenErrors$ = new rxjs_1.Subject();
-        this.operationsCloseErrors$ = new rxjs_1.Subject();
-        this.openedOpsUpdates$ = new rxjs_1.Subject();
-        this.closedOpsUpdates$ = new rxjs_1.Subject();
-        this.liquidatedOpsUpdates$ = new rxjs_1.Subject();
-        this.rejectedOrdersUpdates$ = new rxjs_1.Subject();
-        this.cancelledOrdersUpdates$ = new rxjs_1.Subject();
-        this.activeStatsUpdates$ = new rxjs_1.Subject();
+        this.operationsOpenErrorsEvents$ = new rxjs_1.Subject();
+        this.operationsCloseErrorsEvents$ = new rxjs_1.Subject();
+        this.newActiveOpsEvents$ = new rxjs_1.Subject();
+        this.closedOpsEvents$ = new rxjs_1.Subject();
+        this.liquidatedOpsEvents$ = new rxjs_1.Subject();
+        this.rejectedOrdersEvents$ = new rxjs_1.Subject();
+        this.cancelledOrdersEvents$ = new rxjs_1.Subject();
+        this.activeOperationsStatsUpdates$ = new rxjs_1.Subject();
         this.httpClient = axios_1.default.create({
             baseURL: restAddress,
             headers: {
@@ -47,37 +47,37 @@ class InstanceTraderService extends ws_service_1.BaseWebsocketService {
         }))
             .subscribe();
     }
-    enableActiveStatsUpdates() {
+    enableActiveOperationsStatsUpdates() {
         return new Promise((resolve) => {
-            this.socket.on('active-operation-stats-event', this.activeStatsEventHandler.bind(this));
+            this.socket.on('active-operation-stats-event', this.activeOperationsStatsEventHandler.bind(this));
             this.socket.once('subscribe-active-operations-stats-updates-error', (error) => resolve(error));
             this.socket.once('subscribe-active-operations-stats-updates-success', () => resolve());
             this.safeEmitWithReconnect('subscribe-active-operations-stats-updates');
         });
     }
-    subscribeActiveStatsUpdates() {
-        return this.activeStatsUpdates$.asObservable();
+    subscribeActiveOperationsStatsUpdates() {
+        return this.activeOperationsStatsUpdates$.asObservable();
     }
-    subscribeOpenedOperationsUpdates() {
-        return this.openedOpsUpdates$.asObservable();
+    subscribeNewActiveOperationsEvents() {
+        return this.newActiveOpsEvents$.asObservable();
     }
-    subscribeClosedOperationsUpdates() {
-        return this.closedOpsUpdates$.asObservable();
+    subscribeClosedOperationsEvents() {
+        return this.closedOpsEvents$.asObservable();
     }
-    subscribeLiquidatedOperationsUpdates() {
-        return this.liquidatedOpsUpdates$.asObservable();
+    subscribeLiquidatedOperationsEvents() {
+        return this.liquidatedOpsEvents$.asObservable();
     }
-    subscribeCancelledOrdersUpdates() {
-        return this.cancelledOrdersUpdates$.asObservable();
+    subscribeCancelledOrdersEvents() {
+        return this.cancelledOrdersEvents$.asObservable();
     }
-    subscribeRejectedOrdersUpdates() {
-        return this.rejectedOrdersUpdates$.asObservable();
+    subscribeRejectedOrdersEvents() {
+        return this.rejectedOrdersEvents$.asObservable();
     }
-    subscribeOperationsOpenErrors() {
-        return this.operationsOpenErrors$.asObservable();
+    subscribeOperationsOpenErrorsEvents() {
+        return this.operationsOpenErrorsEvents$.asObservable();
     }
-    subscribeOperationsCloseErrors() {
-        return this.operationsCloseErrors$.asObservable();
+    subscribeOperationsCloseErrorsEvents() {
+        return this.operationsCloseErrorsEvents$.asObservable();
     }
     isReady() {
         return __awaiter(this, void 0, void 0, function* () {
@@ -86,7 +86,7 @@ class InstanceTraderService extends ws_service_1.BaseWebsocketService {
             return resp.data.data;
         });
     }
-    hasOperationOpen(xm, symbol, type) {
+    hasActiveOperation(xm, symbol, type) {
         return __awaiter(this, void 0, void 0, function* () {
             const resp = yield this.httpClient.get(`trader/operation/active?xm=${xm}&symbol=${symbol}&type=${type}`);
             this.throwIfResponseError(resp);
@@ -95,7 +95,7 @@ class InstanceTraderService extends ws_service_1.BaseWebsocketService {
     }
     getActiveOperationsSymbols() {
         return __awaiter(this, void 0, void 0, function* () {
-            const resp = yield this.httpClient.get(`operations/active/symbols/list`);
+            const resp = yield this.httpClient.get(`trader/operations/active/symbols/list`);
             this.throwIfResponseError(resp);
             return resp.data.data;
         });
@@ -136,28 +136,28 @@ class InstanceTraderService extends ws_service_1.BaseWebsocketService {
         });
     }
     liquidatedOpEventHandler(data) {
-        this.liquidatedOpsUpdates$.next(data);
+        this.liquidatedOpsEvents$.next(data);
     }
     cancelledOrdersEventHandler(data) {
-        this.cancelledOrdersUpdates$.next(data);
+        this.cancelledOrdersEvents$.next(data);
     }
     rejectedOrdersEventHandler(data) {
-        this.rejectedOrdersUpdates$.next(data);
+        this.rejectedOrdersEvents$.next(data);
     }
     openedOpEventHandler(data) {
-        this.openedOpsUpdates$.next(data);
+        this.newActiveOpsEvents$.next(data);
     }
     closedOpEventHandler(data) {
-        this.closedOpsUpdates$.next(data);
+        this.closedOpsEvents$.next(data);
     }
     operationOpenErrorEventHandler(operationId) {
-        this.operationsOpenErrors$.next(operationId);
+        this.operationsOpenErrorsEvents$.next(operationId);
     }
     operationCloseErrorEventHandler(operationId) {
-        this.operationsCloseErrors$.next(operationId);
+        this.operationsCloseErrorsEvents$.next(operationId);
     }
-    activeStatsEventHandler(data) {
-        this.activeStatsUpdates$.next(data);
+    activeOperationsStatsEventHandler(data) {
+        this.activeOperationsStatsUpdates$.next(data);
     }
     throwIfResponseError(resp) {
         if (resp.status < 300 && resp.data.statusCode >= 300)
