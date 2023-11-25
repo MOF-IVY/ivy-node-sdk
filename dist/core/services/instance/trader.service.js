@@ -50,9 +50,9 @@ class InstanceTraderService extends ws_service_1.BaseWebsocketService {
     enableActiveStatsUpdates() {
         return new Promise((resolve) => {
             this.socket.on('active-operation-stats-event', this.activeStatsEventHandler.bind(this));
-            this.socket.once('subscribe-active-operation-stats-update-error', (error) => resolve(error));
-            this.socket.once('subscribe-active-operation-stats-update-success', () => resolve());
-            this.safeEmitWithReconnect('subscribe-active-operation-stats-update');
+            this.socket.once('subscribe-active-operations-stats-updates-error', (error) => resolve(error));
+            this.socket.once('subscribe-active-operations-stats-updates-success', () => resolve());
+            this.safeEmitWithReconnect('subscribe-active-operations-stats-updates');
         });
     }
     subscribeActiveStatsUpdates() {
@@ -88,14 +88,14 @@ class InstanceTraderService extends ws_service_1.BaseWebsocketService {
     }
     hasOperationOpen(xm, symbol, type) {
         return __awaiter(this, void 0, void 0, function* () {
-            const resp = yield this.httpClient.get(`trader/operation/open?xm=${xm}&symbol=${symbol}&type=${type}`);
+            const resp = yield this.httpClient.get(`trader/operation/active?xm=${xm}&symbol=${symbol}&type=${type}`);
             this.throwIfResponseError(resp);
             return resp.data.data;
         });
     }
     getActiveOperationsSymbols() {
         return __awaiter(this, void 0, void 0, function* () {
-            const resp = yield this.httpClient.get(`trader/operation/open/symbols`);
+            const resp = yield this.httpClient.get(`operations/active/symbols/list`);
             this.throwIfResponseError(resp);
             return resp.data.data;
         });

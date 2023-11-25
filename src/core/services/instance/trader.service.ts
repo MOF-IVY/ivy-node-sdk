@@ -1,13 +1,5 @@
 import axios, { Axios, AxiosResponse } from 'axios';
-import {
-  Observable,
-  Subject,
-  combineLatest,
-  filter,
-  map,
-  take,
-  tap,
-} from 'rxjs';
+import { Observable, Subject, filter, take, tap } from 'rxjs';
 
 import { ExchangesMarkets } from '../../../models/common/exchanges-markets.type';
 import { ExchangeOperationType } from '../../../models/common/exchange-operation-type';
@@ -96,13 +88,14 @@ export class InstanceTraderService extends BaseWebsocketService {
         this.activeStatsEventHandler.bind(this),
       );
       this.socket.once(
-        'subscribe-active-operation-stats-update-error',
+        'subscribe-active-operations-stats-updates-error',
         (error: IStandardWsError) => resolve(error),
       );
-      this.socket.once('subscribe-active-operation-stats-update-success', () =>
-        resolve(),
+      this.socket.once(
+        'subscribe-active-operations-stats-updates-success',
+        () => resolve(),
       );
-      this.safeEmitWithReconnect('subscribe-active-operation-stats-update');
+      this.safeEmitWithReconnect('subscribe-active-operations-stats-updates');
     });
   }
 
@@ -154,7 +147,7 @@ export class InstanceTraderService extends BaseWebsocketService {
     type: ExchangeOperationType,
   ): Promise<boolean> {
     const resp = await this.httpClient.get<IBaseResponse<boolean>>(
-      `trader/operation/open?xm=${xm}&symbol=${symbol}&type=${type}`,
+      `trader/operation/active?xm=${xm}&symbol=${symbol}&type=${type}`,
     );
 
     this.throwIfResponseError(resp);
@@ -164,7 +157,7 @@ export class InstanceTraderService extends BaseWebsocketService {
 
   async getActiveOperationsSymbols(): Promise<string[]> {
     const resp = await this.httpClient.get<IBaseResponse<string[]>>(
-      `trader/operation/open/symbols`,
+      `operations/active/symbols/list`,
     );
 
     this.throwIfResponseError(resp);
