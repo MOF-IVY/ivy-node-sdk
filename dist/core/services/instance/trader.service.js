@@ -73,7 +73,7 @@ class InstanceTraderService extends ws_service_1.BaseWebsocketService {
         return this.cancelledOpenOrdersEvents$.asObservable();
     }
     subscribeCancelledCloseOrdersEvents() {
-        return this.cancelledOpenOrdersEvents$.asObservable();
+        return this.cancelledCloseOrdersEvents$.asObservable();
     }
     subscribeRejectedOrdersEvents() {
         return this.rejectedOrdersEvents$.asObservable();

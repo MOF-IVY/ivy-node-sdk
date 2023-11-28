@@ -127,7 +127,7 @@ export class InstanceTraderService extends BaseWebsocketService {
   }
 
   subscribeCancelledCloseOrdersEvents(): Observable<ITraderOperation> {
-    return this.cancelledOpenOrdersEvents$.asObservable();
+    return this.cancelledCloseOrdersEvents$.asObservable();
   }
 
   subscribeRejectedOrdersEvents(): Observable<ITraderOperation> {
