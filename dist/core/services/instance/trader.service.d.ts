@@ -18,7 +18,8 @@ export declare class InstanceTraderService extends BaseWebsocketService {
     private readonly closedOpsEvents$;
     private readonly liquidatedOpsEvents$;
     private readonly rejectedOrdersEvents$;
-    private readonly cancelledOrdersEvents$;
+    private readonly cancelledOpenOrdersEvents$;
+    private readonly cancelledCloseOrdersEvents$;
     private readonly activeOperationsStatsUpdates$;
     constructor(restAddress: string, wsAddress: string, apiKey: string);
     enableActiveOperationsStatsUpdates(): Promise<void | IStandardWsError>;
@@ -26,7 +27,8 @@ export declare class InstanceTraderService extends BaseWebsocketService {
     subscribeNewActiveOperationsEvents(): Observable<ITraderOperation>;
     subscribeClosedOperationsEvents(): Observable<ITraderOperation>;
     subscribeLiquidatedOperationsEvents(): Observable<ITraderOperation>;
-    subscribeCancelledOrdersEvents(): Observable<ITraderOperation>;
+    subscribeCancelledOpenOrdersEvents(): Observable<ITraderOperation>;
+    subscribeCancelledCloseOrdersEvents(): Observable<ITraderOperation>;
     subscribeRejectedOrdersEvents(): Observable<ITraderOperation>;
     subscribeOperationsOpenErrorsEvents(): Observable<string>;
     subscribeOperationsCloseErrorsEvents(): Observable<string>;
@@ -39,7 +41,8 @@ export declare class InstanceTraderService extends BaseWebsocketService {
     cancelOpenOrder(operationId: string): Promise<boolean>;
     cancelCloseOrder(operationId: string): Promise<boolean>;
     private liquidatedOpEventHandler;
-    private cancelledOrdersEventHandler;
+    private cancelledOpenOrdersEventHandler;
+    private cancelledCloseOrdersEventHandler;
     private rejectedOrdersEventHandler;
     private openedOpEventHandler;
     private closedOpEventHandler;

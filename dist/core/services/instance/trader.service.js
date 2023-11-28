@@ -25,7 +25,8 @@ class InstanceTraderService extends ws_service_1.BaseWebsocketService {
         this.closedOpsEvents$ = new rxjs_1.Subject();
         this.liquidatedOpsEvents$ = new rxjs_1.Subject();
         this.rejectedOrdersEvents$ = new rxjs_1.Subject();
-        this.cancelledOrdersEvents$ = new rxjs_1.Subject();
+        this.cancelledOpenOrdersEvents$ = new rxjs_1.Subject();
+        this.cancelledCloseOrdersEvents$ = new rxjs_1.Subject();
         this.activeOperationsStatsUpdates$ = new rxjs_1.Subject();
         this.httpClient = axios_1.default.create({
             baseURL: restAddress,
@@ -40,7 +41,8 @@ class InstanceTraderService extends ws_service_1.BaseWebsocketService {
             this.socket.on('closed-operation-event', this.closedOpEventHandler.bind(this));
             this.socket.on('opened-operation-event', this.openedOpEventHandler.bind(this));
             this.socket.on('liquidation-event', this.liquidatedOpEventHandler.bind(this));
-            this.socket.on('cancelled-order-event', this.cancelledOrdersEventHandler.bind(this));
+            this.socket.on('cancelled-open-order-event', this.cancelledOpenOrdersEventHandler.bind(this));
+            this.socket.on('cancelled-close-order-event', this.cancelledCloseOrdersEventHandler.bind(this));
             this.socket.on('rejected-order-event', this.rejectedOrdersEventHandler.bind(this));
             this.socket.on('operation-open-error-event', this.operationOpenErrorEventHandler.bind(this));
             this.socket.on('operation-close-error-event', this.operationCloseErrorEventHandler.bind(this));
@@ -67,8 +69,11 @@ class InstanceTraderService extends ws_service_1.BaseWebsocketService {
     subscribeLiquidatedOperationsEvents() {
         return this.liquidatedOpsEvents$.asObservable();
     }
-    subscribeCancelledOrdersEvents() {
-        return this.cancelledOrdersEvents$.asObservable();
+    subscribeCancelledOpenOrdersEvents() {
+        return this.cancelledOpenOrdersEvents$.asObservable();
+    }
+    subscribeCancelledCloseOrdersEvents() {
+        return this.cancelledOpenOrdersEvents$.asObservable();
     }
     subscribeRejectedOrdersEvents() {
         return this.rejectedOrdersEvents$.asObservable();
@@ -138,8 +143,11 @@ class InstanceTraderService extends ws_service_1.BaseWebsocketService {
     liquidatedOpEventHandler(data) {
         this.liquidatedOpsEvents$.next(data);
     }
-    cancelledOrdersEventHandler(data) {
-        this.cancelledOrdersEvents$.next(data);
+    cancelledOpenOrdersEventHandler(data) {
+        this.cancelledOpenOrdersEvents$.next(data);
+    }
+    cancelledCloseOrdersEventHandler(data) {
+        this.cancelledCloseOrdersEvents$.next(data);
     }
     rejectedOrdersEventHandler(data) {
         this.rejectedOrdersEvents$.next(data);

@@ -388,9 +388,17 @@ export class IvySDK<ScriptConfigType = Record<string, any>> {
   /**
    * Always active stream
    */
-  subscribeCancelledOrdersEvents() {
+  subscribeCancelledOpenOrdersEvents() {
     if (this.trader === null) throw new Error(`Trader service disabled`);
-    return this.trader.subscribeCancelledOrdersEvents();
+    return this.trader.subscribeCancelledOpenOrdersEvents();
+  }
+
+  /**
+   * Always active stream
+   */
+  subscribeCancelledCloseOrdersEvents() {
+    if (this.trader === null) throw new Error(`Trader service disabled`);
+    return this.trader.subscribeCancelledCloseOrdersEvents();
   }
 
   /**

@@ -28,7 +28,9 @@ export class InstanceTraderService extends BaseWebsocketService {
   private readonly closedOpsEvents$ = new Subject<ITraderOperation>();
   private readonly liquidatedOpsEvents$ = new Subject<ITraderOperation>();
   private readonly rejectedOrdersEvents$ = new Subject<ITraderOperation>();
-  private readonly cancelledOrdersEvents$ = new Subject<ITraderOperation>();
+  private readonly cancelledOpenOrdersEvents$ = new Subject<ITraderOperation>();
+  private readonly cancelledCloseOrdersEvents$ =
+    new Subject<ITraderOperation>();
 
   private readonly activeOperationsStatsUpdates$ =
     new Subject<IActiveStatsUpdate>();
@@ -62,8 +64,12 @@ export class InstanceTraderService extends BaseWebsocketService {
             this.liquidatedOpEventHandler.bind(this),
           );
           this.socket.on(
-            'cancelled-order-event',
-            this.cancelledOrdersEventHandler.bind(this),
+            'cancelled-open-order-event',
+            this.cancelledOpenOrdersEventHandler.bind(this),
+          );
+          this.socket.on(
+            'cancelled-close-order-event',
+            this.cancelledCloseOrdersEventHandler.bind(this),
           );
           this.socket.on(
             'rejected-order-event',
@@ -116,8 +122,12 @@ export class InstanceTraderService extends BaseWebsocketService {
     return this.liquidatedOpsEvents$.asObservable();
   }
 
-  subscribeCancelledOrdersEvents(): Observable<ITraderOperation> {
-    return this.cancelledOrdersEvents$.asObservable();
+  subscribeCancelledOpenOrdersEvents(): Observable<ITraderOperation> {
+    return this.cancelledOpenOrdersEvents$.asObservable();
+  }
+
+  subscribeCancelledCloseOrdersEvents(): Observable<ITraderOperation> {
+    return this.cancelledOpenOrdersEvents$.asObservable();
   }
 
   subscribeRejectedOrdersEvents(): Observable<ITraderOperation> {
@@ -222,8 +232,12 @@ export class InstanceTraderService extends BaseWebsocketService {
     this.liquidatedOpsEvents$.next(data);
   }
 
-  private cancelledOrdersEventHandler(data: ITraderOperation) {
-    this.cancelledOrdersEvents$.next(data);
+  private cancelledOpenOrdersEventHandler(data: ITraderOperation) {
+    this.cancelledOpenOrdersEvents$.next(data);
+  }
+
+  private cancelledCloseOrdersEventHandler(data: ITraderOperation) {
+    this.cancelledCloseOrdersEvents$.next(data);
   }
 
   private rejectedOrdersEventHandler(data: ITraderOperation) {
