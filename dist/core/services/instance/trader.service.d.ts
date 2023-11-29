@@ -2,8 +2,8 @@ import { Observable } from 'rxjs';
 import { ExchangesMarkets } from '../../../models/common/exchanges-markets.type';
 import { ExchangeOperationType } from '../../../models/common/exchange-operation-type';
 import { IOperationStats, ITraderOperation } from '../../../models/trader/operation.model';
-import { ITraderOpenOrderOpts } from '../../../models/trader/open-order-config.model';
-import { ITraderCloseOrderOpts } from '../../../models/trader/close-order-config.model';
+import { ITraderOpenOrderConfig } from '../../../models/trader/open-order-config.model';
+import { ITraderCloseOrderConfig } from '../../../models/trader/close-order-config.model';
 import { BaseWebsocketService, IStandardWsError } from '../base/ws.service';
 export interface IActiveStatsUpdate {
     sym: string;
@@ -36,8 +36,8 @@ export declare class InstanceTraderService extends BaseWebsocketService {
     hasActiveOperation(xm: ExchangesMarkets, symbol: string, type: ExchangeOperationType): Promise<boolean>;
     getActiveOperationsSymbols(): Promise<string[]>;
     getClosedOperation(operationId: string): Promise<ITraderOperation>;
-    createNewOperation(opts: ITraderOpenOrderOpts): Promise<string | null>;
-    closeOperation(opts: ITraderCloseOrderOpts): Promise<string | null>;
+    createNewOperation(opts: ITraderOpenOrderConfig): Promise<string | null>;
+    closeOperation(opts: ITraderCloseOrderConfig): Promise<string | null>;
     cancelOpenOrder(operationId: string): Promise<boolean>;
     cancelCloseOrder(operationId: string): Promise<boolean>;
     private liquidatedOpEventHandler;

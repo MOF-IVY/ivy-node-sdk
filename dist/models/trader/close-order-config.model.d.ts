@@ -1,10 +1,6 @@
-import { ExchangeOperationType } from '../common/exchange-operation-type';
-import { ExchangesMarkets } from '../common/exchanges-markets.type';
-export interface ITraderCloseOrderOpts {
-    symbol: string;
+export interface ITraderCloseOrderConfig {
+    operationId: string;
     orderType: 'Limit' | 'Market';
-    exchangeMarket: ExchangesMarkets;
-    operationType: ExchangeOperationType;
     /**
      * Optional, and used only if order type is Limit.
      * If given it will place the limit order at that price.

@@ -1,8 +1,8 @@
 import { Observable } from 'rxjs';
 import { ExchangesMarkets } from '../models/common/exchanges-markets.type';
 import { ExchangeOperationType } from '../models/common/exchange-operation-type';
-import { ITraderOpenOrderOpts } from '../models/trader/open-order-config.model';
-import { ITraderCloseOrderOpts } from '../models/trader/close-order-config.model';
+import { ITraderOpenOrderConfig } from '../models/trader/open-order-config.model';
+import { ITraderCloseOrderConfig } from '../models/trader/close-order-config.model';
 import { IHistoryLoadRequestOpts } from '../models/history-loader/history-load-request.model';
 export interface ISDKConfigOpts {
     apiKey?: string;
@@ -42,8 +42,8 @@ export declare class IvySDK<ScriptConfigType = Record<string, any>> {
     initConfig(config: ScriptConfigType): Promise<ScriptConfigType>;
     getConfig(): Promise<ScriptConfigType>;
     loadHistory(opts: IHistoryLoadRequestOpts): Promise<import("../main").IHistoryLoaded>;
-    newOperation(opts: ITraderOpenOrderOpts): Promise<string | null>;
-    closeOperation(opts: ITraderCloseOrderOpts): Promise<string | null>;
+    newOperation(opts: ITraderOpenOrderConfig): Promise<string | null>;
+    closeOperation(opts: ITraderCloseOrderConfig): Promise<string | null>;
     cancelOrder(operationId: string, orderType: 'open' | 'close'): Promise<boolean>;
     getActiveOperationsSymbols(): Promise<string[]>;
     hasActiveOperation(xm: ExchangesMarkets, symbol: string, type: ExchangeOperationType): Promise<boolean>;

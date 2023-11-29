@@ -9,8 +9,8 @@ import {
   ITraderOperation,
 } from '../../../models/trader/operation.model';
 import { IBaseResponse } from '../../../models/common/base-response.model';
-import { ITraderOpenOrderOpts } from '../../../models/trader/open-order-config.model';
-import { ITraderCloseOrderOpts } from '../../../models/trader/close-order-config.model';
+import { ITraderOpenOrderConfig } from '../../../models/trader/open-order-config.model';
+import { ITraderCloseOrderConfig } from '../../../models/trader/close-order-config.model';
 import { BaseWebsocketService, IStandardWsError } from '../base/ws.service';
 
 export interface IActiveStatsUpdate {
@@ -186,7 +186,9 @@ export class InstanceTraderService extends BaseWebsocketService {
     return resp.data.data!;
   }
 
-  async createNewOperation(opts: ITraderOpenOrderOpts): Promise<string | null> {
+  async createNewOperation(
+    opts: ITraderOpenOrderConfig,
+  ): Promise<string | null> {
     const resp = await this.httpClient.post<IBaseResponse<string | null>>(
       'trader/operation/new',
       opts,
@@ -197,7 +199,7 @@ export class InstanceTraderService extends BaseWebsocketService {
     return resp.data.data!;
   }
 
-  async closeOperation(opts: ITraderCloseOrderOpts): Promise<string | null> {
+  async closeOperation(opts: ITraderCloseOrderConfig): Promise<string | null> {
     const resp = await this.httpClient.post<IBaseResponse<string | null>>(
       'trader/operation/close',
       opts,

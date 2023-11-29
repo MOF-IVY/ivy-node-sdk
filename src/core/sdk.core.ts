@@ -10,8 +10,8 @@ import { GatewayPumpDumpService } from './services/gateway/pumpdump.service';
 import { InstanceHistoryLoaderService } from './services/instance/history-loader.service';
 import { InstanceLoggingCenterService } from './services/instance/logging-center.service';
 
-import { ITraderOpenOrderOpts } from '../models/trader/open-order-config.model';
-import { ITraderCloseOrderOpts } from '../models/trader/close-order-config.model';
+import { ITraderOpenOrderConfig } from '../models/trader/open-order-config.model';
+import { ITraderCloseOrderConfig } from '../models/trader/close-order-config.model';
 import { IHistoryLoadRequestOpts } from '../models/history-loader/history-load-request.model';
 import { InstanceControlCenterService } from './services/instance/control-center.service';
 
@@ -215,12 +215,12 @@ export class IvySDK<ScriptConfigType = Record<string, any>> {
     return this.historyLoader.loadHistory(opts);
   }
 
-  newOperation(opts: ITraderOpenOrderOpts) {
+  newOperation(opts: ITraderOpenOrderConfig) {
     if (this.trader === null) throw new Error(`Trader service disabled`);
     return this.trader.createNewOperation(opts);
   }
 
-  closeOperation(opts: ITraderCloseOrderOpts) {
+  closeOperation(opts: ITraderCloseOrderConfig) {
     if (this.trader === null) throw new Error(`Trader service disabled`);
     return this.trader.closeOperation(opts);
   }

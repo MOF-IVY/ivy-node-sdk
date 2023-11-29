@@ -1,7 +1,7 @@
 import { ExchangeOperationType } from '../common/exchange-operation-type';
 import { ExchangesMarkets } from '../common/exchanges-markets.type';
 
-export interface ITraderOpenOrderOpts {
+export interface ITraderOpenOrderConfig {
   symbol: string;
   orderType: 'Limit' | 'Market';
   operationType: ExchangeOperationType;
